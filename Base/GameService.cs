@@ -4,23 +4,20 @@ using UnityEngine;
 
 namespace PEPErvice.Base
 {
-	public abstract class GameService : MonoBehaviour, IService 
+	public abstract class GameService : MonoBehaviour, IService
 	{
-		[SerializeField] private bool isDontDestroy;
-		protected bool IsDontDestroy => isDontDestroy;
-
 		protected static bool IsApplicationQuitting { get; private set; }
+
+		private static bool IsCanDispose => IsApplicationQuitting == false;
 
 		private void OnApplicationQuit()
 		{
 			IsApplicationQuitting = true;
 		}
 
-		private bool IsCanDispose => IsApplicationQuitting == false && IsDontDestroy == false;
-
 		void IDisposable.Dispose()
 		{
-			if(IsCanDispose)
+			if (IsCanDispose)
 				Destroy(this);
 		}
 	}
@@ -32,7 +29,7 @@ namespace PEPErvice.Base
 
 		private static bool CanInitialize =>
 			ReferenceEquals(instance, null) && IsApplicationQuitting == false;
-		
+
 		private void Awake()
 		{
 #if UNITY_EDITOR || DEBUG
@@ -41,17 +38,12 @@ namespace PEPErvice.Base
 			if (CanInitialize)
 			{
 				instance = this as TService;
-				
-				if (IsDontDestroy) 
-					DontDestroyOnLoad(this);
-				
-				ServiceLocator.Instance.Register<TService>(this, 
-					IsDontDestroy ? Lifetime.Singleton : Lifetime.Scene);
-				
 				OnInitialized();
 			}
 			else
+			{
 				DestroyImmediate(this);
+			}
 		}
 
 		private void OnDestroy()
@@ -59,7 +51,7 @@ namespace PEPErvice.Base
 #if UNITY_EDITOR || DEBUG
 			UnityEngine.Debug.Log($"#GameService# <{typeof(TService).Name}> {name} Destroyed", this);
 #endif
-			if (instance != this) 
+			if (instance != this)
 				return;
 			OnDestroyed();
 		}
