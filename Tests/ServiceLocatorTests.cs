@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections;
-using GameAssets.Code.Services.Tests.Objects;
 using NUnit.Framework;
-using PEPErvice;
+using PEPErvice.Tests.Objects;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-namespace GameAssets.Code.Services.Tests
+namespace PEPErvice.Tests
 {
 	[RequiresPlayMode(false)]
 	internal class ServiceLocatorTests

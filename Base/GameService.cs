@@ -1,3 +1,4 @@
+using System;
 using PEPErvice.Interfaces;
 using UnityEngine;
 
@@ -13,6 +14,14 @@ namespace PEPErvice.Base
 		private void OnApplicationQuit()
 		{
 			IsApplicationQuitting = true;
+		}
+
+		private bool IsCanDispose => IsApplicationQuitting == false && IsDontDestroy == false;
+
+		void IDisposable.Dispose()
+		{
+			if(IsCanDispose)
+				Destroy(this);
 		}
 	}
 
@@ -32,10 +41,12 @@ namespace PEPErvice.Base
 			if (CanInitialize)
 			{
 				instance = this as TService;
+				
 				if (IsDontDestroy) 
 					DontDestroyOnLoad(this);
 				
-				ServiceLocator.Instance.Register<TService>(this);
+				ServiceLocator.Instance.Register<TService>(this, 
+					IsDontDestroy ? Lifetime.Singleton : Lifetime.Scene);
 				
 				OnInitialized();
 			}

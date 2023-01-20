@@ -1,6 +1,9 @@
-﻿namespace GameAssets.Code.Services.Tests.Objects
+﻿namespace PEPErvice.Tests.Objects
 {
 	public class TestService : ITestService
 	{
+		public void Dispose()
+		{
+		}
 	}
 }

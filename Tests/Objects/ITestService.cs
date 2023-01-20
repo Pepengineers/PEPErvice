@@ -1,6 +1,6 @@
 ﻿using PEPErvice.Interfaces;
 
-namespace GameAssets.Code.Services.Tests.Objects
+namespace PEPErvice.Tests.Objects
 {
 	public interface ITestService : IService
 	{

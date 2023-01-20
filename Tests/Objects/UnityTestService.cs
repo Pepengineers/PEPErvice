@@ -1,6 +1,6 @@
 ﻿using PEPErvice.Base;
 
-namespace GameAssets.Code.Services.Tests.Objects
+namespace PEPErvice.Tests.Objects
 {
 	public class UnityTestService : GameService<UnityTestService>, ITestService
 	{

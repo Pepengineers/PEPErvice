@@ -1,7 +1,9 @@
-﻿namespace PEPErvice.Interfaces
+﻿using System;
+
+namespace PEPErvice.Interfaces
 {
-	public interface IService
+	public interface IService : IDisposable
 	{
-		
+
 	}
 }

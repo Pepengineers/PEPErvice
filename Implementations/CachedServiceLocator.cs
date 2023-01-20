@@ -1,23 +1,53 @@
 ﻿using System;
 using System.Collections.Generic;
 using PEPErvice.Interfaces;
+using UnityEngine.SceneManagement;
 
 namespace PEPErvice.Implementations
 {
+
+	
 	internal class CachedServiceLocator : IServiceLocator
 	{
 		private readonly Dictionary<Type, IService> registeredTypes = new();
 		private readonly Dictionary<Type, Func<IService>> serviceFactories = new();
-		
+		private readonly HashSet<Type> sceneOnlyTypes = new();
+
+		public CachedServiceLocator()
+		{
+			SceneManager.sceneUnloaded += OnSceneUnloaded;
+		}
+
+		private void OnSceneUnloaded(Scene scene)
+		{
+			foreach (var sceneOnlyType in sceneOnlyTypes)
+			{
+				if(registeredTypes.Remove(sceneOnlyType, out var service))
+				{
+					try
+					{
+						service.Dispose();
+					}
+					catch (Exception e)
+					{
+						UnityEngine.Debug.LogException(e);
+					}
+				}
+			}
+		}
+
 		public IReadOnlyCollection<IService> Services => registeredTypes.Values;
 		
-		public void Bind<TService>(Func<TService> resolver) where TService : class, IService
+		public void Bind<TService>(Func<TService> resolver, Lifetime lifetime = Lifetime.Singleton) where TService : class, IService
 		{
 			if (resolver == null)
 				throw new ArgumentNullException();
 			
 			var type = typeof(TService);
 			serviceFactories[type] = resolver;
+			
+			if (lifetime == Lifetime.Scene)
+				sceneOnlyTypes.Add(type);
 		}
 
 		public TService Resolve<TService>() where TService : class, IService
@@ -41,21 +71,26 @@ namespace PEPErvice.Implementations
 		{
 			var type = typeof(TService);
 			serviceFactories.Remove(type);
+			sceneOnlyTypes.Remove(type);
 		}
 
-		public void Register<TService>(IService service) where TService : class, IService
+		public void Register<TService>(IService service, Lifetime lifetime = Lifetime.Singleton) where TService : class, IService
 		{
 			if (service == null)
 				throw new ArgumentNullException();
 			
 			var type = typeof(TService);
 			registeredTypes[type] = service;
+			
+			if (lifetime == Lifetime.Scene)
+				sceneOnlyTypes.Add(type);
 		}
 
 		public void Unregister<TService>() where TService : class, IService
 		{
 			var type = typeof(TService);
 			registeredTypes.Remove(type);
+			sceneOnlyTypes.Remove(type);
 		}
 	}
 }
