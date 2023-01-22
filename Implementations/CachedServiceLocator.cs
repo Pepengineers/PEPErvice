@@ -57,7 +57,7 @@ namespace PEPErvice.Implementations
 		{
 			var type = TypeFactory<TService>.Type;
 			serviceFactories.Remove(type);
-			sceneOnlyTypes.Remove(type);
+			RemoveExist(type);
 		}
 
 		public void Register<TService>(IService service, Lifetime lifetime = Lifetime.Singleton)
@@ -76,22 +76,28 @@ namespace PEPErvice.Implementations
 		public void Unregister<TService>() where TService : class, IService
 		{
 			var type = TypeFactory<TService>.Type;
-			registeredTypes.Remove(type);
 			sceneOnlyTypes.Remove(type);
+			RemoveExist(type);
 		}
 
+		private void RemoveExist(Type type)
+		{
+			if (registeredTypes.Remove(type, out var service) == false) return;
+
+			try
+			{
+				service.Dispose();
+			}
+			catch (Exception e)
+			{
+				UnityEngine.Debug.LogException(e);
+			}
+		}
+		
 		private void OnSceneUnloaded(Scene scene)
 		{
 			foreach (var sceneOnlyType in sceneOnlyTypes)
-				if (registeredTypes.Remove(sceneOnlyType, out var service))
-					try
-					{
-						service.Dispose();
-					}
-					catch (Exception e)
-					{
-						UnityEngine.Debug.LogException(e);
-					}
+				RemoveExist(sceneOnlyType);
 		}
 	}
 }
