@@ -5,6 +5,11 @@ using UnityEngine.SceneManagement;
 
 namespace PEPErvice.Implementations
 {
+	internal static class TypeFactory<T>
+	{
+		public static Type Type { get; } = typeof(T);
+	}
+	
 	internal class CachedServiceLocator : IServiceLocator
 	{
 		private readonly Dictionary<Type, IService> registeredTypes = new();
@@ -24,7 +29,7 @@ namespace PEPErvice.Implementations
 			if (resolver == null)
 				throw new ArgumentNullException();
 
-			var type = typeof(TService);
+			var type = TypeFactory<TService>.Type;
 			serviceFactories[type] = resolver;
 
 			if (lifetime == Lifetime.Scene)
@@ -50,7 +55,7 @@ namespace PEPErvice.Implementations
 
 		public void Unbind<TService>() where TService : class, IService
 		{
-			var type = typeof(TService);
+			var type = TypeFactory<TService>.Type;
 			serviceFactories.Remove(type);
 			sceneOnlyTypes.Remove(type);
 		}
@@ -61,7 +66,7 @@ namespace PEPErvice.Implementations
 			if (service == null)
 				throw new ArgumentNullException();
 
-			var type = typeof(TService);
+			var type = TypeFactory<TService>.Type;
 			registeredTypes[type] = service;
 
 			if (lifetime == Lifetime.Scene)
@@ -70,7 +75,7 @@ namespace PEPErvice.Implementations
 
 		public void Unregister<TService>() where TService : class, IService
 		{
-			var type = typeof(TService);
+			var type = TypeFactory<TService>.Type;
 			registeredTypes.Remove(type);
 			sceneOnlyTypes.Remove(type);
 		}

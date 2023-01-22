@@ -54,6 +54,7 @@ namespace PEPErvice.Base
 			if (instance != this)
 				return;
 			OnDestroyed();
+			instance = null;
 		}
 
 		protected virtual void OnInitialized()
