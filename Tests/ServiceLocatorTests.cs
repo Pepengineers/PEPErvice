@@ -14,12 +14,14 @@ namespace PEPErvice.Tests
 		public void SetUp()
 		{
 			ServiceLocator.Instance.Unregister<ITestService>();
+			ServiceLocator.Instance.Unbind<ITestService>();
 		}
 
 		[TearDown]
 		public void TearDown()
 		{
 			ServiceLocator.Instance.Unregister<ITestService>();
+			ServiceLocator.Instance.Unbind<ITestService>();
 		}
 
 		[Test]
@@ -51,6 +53,30 @@ namespace PEPErvice.Tests
 			Assert.IsNotNull(service);
 			Assert.IsInstanceOf<UnityTestService>(service);
 			Assert.AreSame(service, gameService);
+		}
+		[Test]
+		public void CheckDIBindind()
+		{
+			var di = ServiceLocator.Instance;
+			di.Bind<ITestService>(()=> new TestService());
+
+			var service = di.Resolve<ITestService>();
+			Assert.IsNotNull(service);
+			Assert.IsInstanceOf<TestService>(service);
+		}
+
+		[UnityTest]
+		[RequiresPlayMode]
+		public IEnumerator CheckDIFactory()
+		{
+			var di = ServiceLocator.Instance;
+			di.Bind<ITestService>(()=> new GameObject().AddComponent<UnityTestService>());
+
+			yield return null;
+			
+			var service = di.Resolve<ITestService>();
+			Assert.IsNotNull(service);
+			Assert.IsInstanceOf<UnityTestService>(service);
 		}
 	}
 }
