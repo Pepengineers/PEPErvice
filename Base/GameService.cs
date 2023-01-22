@@ -1,4 +1,5 @@
 using System;
+using PEPErvice.Implementations;
 using PEPErvice.Interfaces;
 using UnityEngine;
 
@@ -33,7 +34,7 @@ namespace PEPErvice.Base
 		private void Awake()
 		{
 #if UNITY_EDITOR || DEBUG
-			UnityEngine.Debug.Log($"#GameService# <{typeof(TService).Name}> Created", this);
+			UnityEngine.Debug.Log($"#GameService# <{TypeFactory<TService>.Type.Name}> Created", this);
 #endif
 			if (CanInitialize)
 			{
@@ -49,7 +50,7 @@ namespace PEPErvice.Base
 		private void OnDestroy()
 		{
 #if UNITY_EDITOR || DEBUG
-			UnityEngine.Debug.Log($"#GameService# <{typeof(TService).Name}> {name} Destroyed", this);
+			UnityEngine.Debug.Log($"#GameService# <{TypeFactory<TService>.Type.Name}> {name} Destroyed", this);
 #endif
 			if (instance != this)
 				return;

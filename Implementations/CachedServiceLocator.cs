@@ -38,7 +38,7 @@ namespace PEPErvice.Implementations
 
 		public TService Resolve<TService>() where TService : class, IService
 		{
-			var type = typeof(TService);
+			var type = TypeFactory<TService>.Type;
 
 			if (registeredTypes.TryGetValue(type, out var service))
 				return service as TService;
