@@ -9,7 +9,7 @@ namespace PEPErvice.Base
 	{
 		protected static bool IsApplicationQuitting { get; private set; }
 
-		private static bool IsCanDispose => IsApplicationQuitting == false;
+		private static bool CanDispose => IsApplicationQuitting == false;
 
 		private void OnApplicationQuit()
 		{
@@ -18,7 +18,7 @@ namespace PEPErvice.Base
 
 		void IDisposable.Dispose()
 		{
-			if (IsCanDispose)
+			if (CanDispose)
 				Destroy(this);
 		}
 	}

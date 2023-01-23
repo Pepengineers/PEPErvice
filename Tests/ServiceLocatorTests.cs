@@ -55,7 +55,7 @@ namespace PEPErvice.Tests
 			Assert.AreSame(service, gameService);
 		}
 		[Test]
-		public void CheckDIBindind()
+		public void CheckDIBinding()
 		{
 			var di = ServiceLocator.Instance;
 			di.Bind<ITestService>(()=> new TestService());

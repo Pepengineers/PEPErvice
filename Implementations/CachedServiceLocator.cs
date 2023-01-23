@@ -9,10 +9,10 @@ namespace PEPErvice.Implementations
 	{
 		public static Type Type { get; } = typeof(T);
 	}
-	
+
 	internal class CachedServiceLocator : IServiceLocator
 	{
-		private readonly Dictionary<Type, IService> registeredTypes = new();
+		private readonly Dictionary<Type, IService> registeredServices = new();
 		private readonly HashSet<Type> sceneOnlyTypes = new();
 		private readonly Dictionary<Type, Func<IService>> serviceFactories = new();
 
@@ -21,7 +21,7 @@ namespace PEPErvice.Implementations
 			SceneManager.sceneUnloaded += OnSceneUnloaded;
 		}
 
-		public IReadOnlyCollection<IService> Services => registeredTypes.Values;
+		public IReadOnlyCollection<IService> Services => registeredServices.Values;
 
 		public void Bind<TService>(Func<TService> resolver, Lifetime lifetime = Lifetime.Singleton)
 			where TService : class, IService
@@ -40,13 +40,13 @@ namespace PEPErvice.Implementations
 		{
 			var type = TypeFactory<TService>.Type;
 
-			if (registeredTypes.TryGetValue(type, out var service))
+			if (registeredServices.TryGetValue(type, out var service))
 				return service as TService;
 
 			if (serviceFactories.TryGetValue(type, out var factory))
 			{
 				service = factory();
-				registeredTypes[type] = service;
+				registeredServices[type] = service;
 				return service as TService;
 			}
 
@@ -57,7 +57,7 @@ namespace PEPErvice.Implementations
 		{
 			var type = TypeFactory<TService>.Type;
 			serviceFactories.Remove(type);
-			RemoveExist(type);
+			RemoveRegisteredType(type);
 		}
 
 		public void Register<TService>(IService service, Lifetime lifetime = Lifetime.Singleton)
@@ -67,7 +67,7 @@ namespace PEPErvice.Implementations
 				throw new ArgumentNullException();
 
 			var type = TypeFactory<TService>.Type;
-			registeredTypes[type] = service;
+			registeredServices[type] = service;
 
 			if (lifetime == Lifetime.Scene)
 				sceneOnlyTypes.Add(type);
@@ -77,12 +77,12 @@ namespace PEPErvice.Implementations
 		{
 			var type = TypeFactory<TService>.Type;
 			sceneOnlyTypes.Remove(type);
-			RemoveExist(type);
+			RemoveRegisteredType(type);
 		}
 
-		private void RemoveExist(Type type)
+		private void RemoveRegisteredType(Type type)
 		{
-			if (registeredTypes.Remove(type, out var service) == false) return;
+			if (registeredServices.Remove(type, out var service) == false) return;
 
 			try
 			{
@@ -93,11 +93,11 @@ namespace PEPErvice.Implementations
 				UnityEngine.Debug.LogException(e);
 			}
 		}
-		
+
 		private void OnSceneUnloaded(Scene scene)
 		{
 			foreach (var sceneOnlyType in sceneOnlyTypes)
-				RemoveExist(sceneOnlyType);
+				RemoveRegisteredType(sceneOnlyType);
 		}
 	}
 }
