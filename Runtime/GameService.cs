@@ -3,7 +3,7 @@ using PEPErvice.Implementations;
 using PEPErvice.Interfaces;
 using UnityEngine;
 
-namespace PEPErvice.Base
+namespace PEPErvice.Runtime
 {
 	public abstract class GameService : MonoBehaviour, IService
 	{
