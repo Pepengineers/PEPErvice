@@ -46,19 +46,20 @@ namespace PEPErvice.Tests
 		{
 			var gameService = new GameObject("Test").AddComponent<UnityTestService>();
 			ServiceLocator.Instance.Register<ITestService>(gameService);
-			
+
 			yield return null;
-			
+
 			var service = ServiceLocator.Instance.Resolve<ITestService>();
 			Assert.IsNotNull(service);
 			Assert.IsInstanceOf<UnityTestService>(service);
 			Assert.AreSame(service, gameService);
 		}
+
 		[Test]
 		public void CheckDIBinding()
 		{
 			var di = ServiceLocator.Instance;
-			di.Bind<ITestService>(()=> new TestService());
+			di.Bind<ITestService>(() => new TestService());
 
 			var service = di.Resolve<ITestService>();
 			Assert.IsNotNull(service);
@@ -70,10 +71,10 @@ namespace PEPErvice.Tests
 		public IEnumerator CheckDIFactory()
 		{
 			var di = ServiceLocator.Instance;
-			di.Bind<ITestService>(()=> new GameObject().AddComponent<UnityTestService>());
+			di.Bind<ITestService>(() => new GameObject().AddComponent<UnityTestService>());
 
 			yield return null;
-			
+
 			var service = di.Resolve<ITestService>();
 			Assert.IsNotNull(service);
 			Assert.IsInstanceOf<UnityTestService>(service);

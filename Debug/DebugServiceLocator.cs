@@ -5,8 +5,8 @@ namespace PEPErvice.Debug
 {
 	internal static class DebugServiceLocator
 	{
-		private static readonly StringBuilder Builder = new StringBuilder();
-		
+		private static readonly StringBuilder Builder = new();
+
 		[MenuItem("Debug/Tools/Services Dump")]
 		public static void PrintDump()
 		{
@@ -14,10 +14,7 @@ namespace PEPErvice.Debug
 			Builder.AppendLine("Services DUMP");
 			var services = ServiceLocator.Instance.Services;
 			Builder.AppendLine($"Alive Services {services.Count}");
-			foreach (var service in services)
-			{
-				Builder.AppendLine($"\t {service.GetType().FullName}");
-			}
+			foreach (var service in services) Builder.AppendLine($"\t {service.GetType().FullName}");
 			UnityEngine.Debug.Log(Builder.ToString());
 		}
 	}
