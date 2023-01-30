@@ -39,6 +39,7 @@ namespace PEPErvice.Runtime
 			if (CanInitialize)
 			{
 				instance = this as TService;
+				DontDestroyOnLoad(this);
 				OnInitialized();
 			}
 			else

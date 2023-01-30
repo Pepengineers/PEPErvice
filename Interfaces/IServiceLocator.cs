@@ -13,7 +13,7 @@ namespace PEPErvice.Interfaces
 	{
 		IReadOnlyCollection<IService> Services { get; }
 
-		void Bind<TService>(Func<TService> resolver, Lifetime lifetime = Lifetime.Singleton)
+		IServiceLocator Bind<TService>(Func<TService> resolver, Lifetime lifetime = Lifetime.Singleton)
 			where TService : class, IService;
 
 		TService Resolve<TService>() where TService : class, IService;

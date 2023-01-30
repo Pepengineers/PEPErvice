@@ -23,7 +23,7 @@ namespace PEPErvice.Implementations
 
 		public IReadOnlyCollection<IService> Services => registeredServices.Values;
 
-		public void Bind<TService>(Func<TService> resolver, Lifetime lifetime = Lifetime.Singleton)
+		public IServiceLocator Bind<TService>(Func<TService> resolver, Lifetime lifetime = Lifetime.Singleton)
 			where TService : class, IService
 		{
 			if (resolver == null)
@@ -34,6 +34,8 @@ namespace PEPErvice.Implementations
 
 			if (lifetime == Lifetime.Scene)
 				sceneOnlyTypes.Add(type);
+
+			return this;
 		}
 
 		public TService Resolve<TService>() where TService : class, IService
