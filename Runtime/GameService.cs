@@ -33,11 +33,11 @@ namespace PEPErvice.Runtime
 
 		private void Awake()
 		{
-#if UNITY_EDITOR || DEBUG
-			UnityEngine.Debug.Log($"#GameService# <{TypeFactory<TService>.Type.Name}> Created", this);
-#endif
 			if (CanInitialize)
 			{
+#if UNITY_EDITOR || DEBUG
+				UnityEngine.Debug.Log($"#GameService# <{TypeFactory<TService>.Type.Name}> Created", this);
+#endif
 				instance = this as TService;
 				DontDestroyOnLoad(this);
 				OnInitialized();
@@ -50,11 +50,11 @@ namespace PEPErvice.Runtime
 
 		private void OnDestroy()
 		{
+			if (instance != this)
+				return;
 #if UNITY_EDITOR || DEBUG
 			UnityEngine.Debug.Log($"#GameService# <{TypeFactory<TService>.Type.Name}> {name} Destroyed", this);
 #endif
-			if (instance != this)
-				return;
 			OnDestroyed();
 			instance = null;
 		}
