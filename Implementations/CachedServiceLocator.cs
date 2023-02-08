@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using PEPErvice.Interfaces;
+using PEPEngineers.PEPErvice.Interfaces;
 using UnityEngine.SceneManagement;
 
-namespace PEPErvice.Implementations
+namespace PEPEngineers.PEPErvice.Implementations
 {
 	internal static class TypeFactory<T>
 	{

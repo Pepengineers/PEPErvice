@@ -1,7 +1,7 @@
-﻿using PEPErvice.Implementations;
-using PEPErvice.Interfaces;
+﻿using PEPEngineers.PEPErvice.Implementations;
+using PEPEngineers.PEPErvice.Interfaces;
 
-namespace PEPErvice
+namespace PEPEngineers.PEPErvice
 {
 	public static class ServiceLocator
 	{

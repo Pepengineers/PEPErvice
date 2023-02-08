@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PEPErvice.Interfaces
+namespace PEPEngineers.PEPErvice.Interfaces
 {
 	public interface IService : IDisposable
 	{

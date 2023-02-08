@@ -1,6 +1,6 @@
 {
-  "name": "PEPErvice",
-  "rootNamespace": "",
+  "name": "PEPEngineers.PEPErvice",
+  "rootNamespace": "PEPEngineers",
   "references": [],
   "includePlatforms": [],
   "excludePlatforms": [],

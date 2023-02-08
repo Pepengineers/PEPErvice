@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace PEPErvice.Interfaces
+namespace PEPEngineers.PEPErvice.Interfaces
 {
 	public enum Lifetime : sbyte
 	{

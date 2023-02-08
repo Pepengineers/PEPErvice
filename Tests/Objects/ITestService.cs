@@ -1,6 +1,6 @@
-﻿using PEPErvice.Interfaces;
+﻿using PEPEngineers.PEPErvice.Interfaces;
 
-namespace PEPErvice.Tests.Objects
+namespace PEPEngineers.PEPErvice.Tests.Objects
 {
 	public interface ITestService : IService
 	{

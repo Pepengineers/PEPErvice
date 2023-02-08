@@ -1,6 +1,6 @@
-﻿using PEPErvice.Runtime;
+﻿using PEPEngineers.PEPErvice.Runtime;
 
-namespace PEPErvice.Tests.Objects
+namespace PEPEngineers.PEPErvice.Tests.Objects
 {
 	public class UnityTestService : GameService<UnityTestService>, ITestService
 	{
