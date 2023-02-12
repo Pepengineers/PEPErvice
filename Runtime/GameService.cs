@@ -44,7 +44,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 			}
 			else
 			{
-				DestroyImmediate(this);
+				DestroyImmediate(gameObject);
 			}
 		}
 
