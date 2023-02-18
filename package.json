@@ -1,0 +1,16 @@
+{
+  "name": "com.pepengineers.pepervice",
+  "displayName": "PEPErvice",
+  "version": "1.0.0",
+  "unity": "2018.4",
+  "license": "MIT",
+  "description": "PEPErvice is an Service locator system for the Unity.",
+  "keywords": [
+    "events",
+    "pepe",
+    "optimization"
+  ],
+  "category": "game tool",
+  "dependencies": {},
+  "samples": []
+}
