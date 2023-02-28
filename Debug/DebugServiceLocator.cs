@@ -1,8 +1,13 @@
 ﻿using System.Text;
+
+#if UNITY_EDITOR
+
 using UnityEditor;
+#endif
 
 namespace PEPEngineers.PEPErvice.Debug
 {
+#if UNITY_EDITOR
 	internal static class DebugServiceLocator
 	{
 		private static readonly StringBuilder Builder = new();
@@ -18,4 +23,5 @@ namespace PEPEngineers.PEPErvice.Debug
 			UnityEngine.Debug.Log(Builder.ToString());
 		}
 	}
+#endif
 }
