@@ -35,7 +35,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 		{
 			if (CanInitialize)
 			{
-#if UNITY_EDITOR || DEBUG
+#if DEBUG_LOG
 				UnityEngine.Debug.Log($"#GameService# <{TypeFactory<TService>.Type.Name}> Created", this);
 #endif
 				instance = this as TService;
@@ -52,7 +52,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 		{
 			if (instance != this)
 				return;
-#if UNITY_EDITOR || DEBUG
+#if DEBUG_LOG
 			UnityEngine.Debug.Log($"#GameService# <{TypeFactory<TService>.Type.Name}> {name} Destroyed", this);
 #endif
 			OnDestroyed();
