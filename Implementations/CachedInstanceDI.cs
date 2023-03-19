@@ -10,21 +10,21 @@ namespace PEPEngineers.PEPErvice.Implementations
 		public static Type Type { get; } = typeof(T);
 	}
 
-	internal class CachedServiceLocator : IServiceLocator
+	internal class CachedInstanceDI : ILocator, IRegister
 	{
-		private readonly Dictionary<Type, IService> registeredServices = new();
+		private readonly Dictionary<Type, object> registeredServices = new();
 		private readonly HashSet<Type> sceneOnlyTypes = new();
-		private readonly Dictionary<Type, Func<IService>> serviceFactories = new();
+		private readonly Dictionary<Type, Func<object>> serviceFactories = new();
 
-		public CachedServiceLocator()
+		public CachedInstanceDI()
 		{
 			SceneManager.sceneUnloaded += OnSceneUnloaded;
 		}
 
-		public IReadOnlyCollection<IService> Services => registeredServices.Values;
+		public IReadOnlyCollection<object> Instances => registeredServices.Values;
 
-		public IServiceLocator Bind<TService>(Func<TService> resolver, Lifetime lifetime = Lifetime.Singleton)
-			where TService : class, IService
+		public IRegister Bind<TService>(Func<TService> resolver, Lifetime lifetime = Lifetime.Singleton)
+			where TService : class
 		{
 			if (resolver == null)
 				throw new ArgumentNullException();
@@ -38,7 +38,7 @@ namespace PEPEngineers.PEPErvice.Implementations
 			return this;
 		}
 
-		public TService Resolve<TService>() where TService : class, IService
+		public TService Resolve<TService>() where TService : class
 		{
 			var type = TypeFactory<TService>.Type;
 
@@ -55,15 +55,15 @@ namespace PEPEngineers.PEPErvice.Implementations
 			return null;
 		}
 
-		public void Unbind<TService>() where TService : class, IService
+		public void Unbind<TService>() where TService : class
 		{
 			var type = TypeFactory<TService>.Type;
 			serviceFactories.Remove(type);
 			RemoveRegisteredType(type);
 		}
 
-		public void Register<TService>(IService service, Lifetime lifetime = Lifetime.Singleton)
-			where TService : class, IService
+		public void Register<TService>(object service, Lifetime lifetime = Lifetime.Singleton)
+			where TService : class
 		{
 			if (service == null)
 				throw new ArgumentNullException();
@@ -75,7 +75,7 @@ namespace PEPEngineers.PEPErvice.Implementations
 				sceneOnlyTypes.Add(type);
 		}
 
-		public void Unregister<TService>() where TService : class, IService
+		public void Unregister<TService>() where TService : class
 		{
 			var type = TypeFactory<TService>.Type;
 			sceneOnlyTypes.Remove(type);
@@ -84,11 +84,14 @@ namespace PEPEngineers.PEPErvice.Implementations
 
 		private void RemoveRegisteredType(Type type)
 		{
-			if (registeredServices.Remove(type, out var service) == false) return;
+			if (registeredServices.Remove(type, out var item) == false) return;
 
 			try
 			{
-				service.Dispose();
+				if(item is IService service)
+					service.Dispose();
+				
+				
 			}
 			catch (Exception e)
 			{
@@ -99,7 +102,10 @@ namespace PEPEngineers.PEPErvice.Implementations
 		private void OnSceneUnloaded(Scene scene)
 		{
 			foreach (var sceneOnlyType in sceneOnlyTypes)
+			{
 				RemoveRegisteredType(sceneOnlyType);
+			}
+			sceneOnlyTypes.Clear();
 		}
 	}
 }
