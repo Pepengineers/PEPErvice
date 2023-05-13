@@ -62,7 +62,7 @@ namespace PEPEngineers.PEPErvice.Implementations
 			RemoveRegisteredType(type);
 		}
 
-		public void Register<TService>(object service, Lifetime lifetime = Lifetime.Singleton)
+		public IRegister Register<TService>(object service, Lifetime lifetime = Lifetime.Singleton)
 			where TService : class
 		{
 			if (service == null)
@@ -73,6 +73,8 @@ namespace PEPEngineers.PEPErvice.Implementations
 
 			if (lifetime == Lifetime.Scene)
 				sceneOnlyTypes.Add(type);
+
+			return this;
 		}
 
 		public void Unregister<TService>() where TService : class

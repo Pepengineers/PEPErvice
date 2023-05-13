@@ -16,7 +16,7 @@ namespace PEPEngineers.PEPErvice.Interfaces
 		
 		void Unbind<TService>() where TService : class;
 		
-		void Register<TService>(object service, Lifetime lifetime = Lifetime.Singleton)
+		IRegister Register<TService>(object service, Lifetime lifetime = Lifetime.Singleton)
 			where TService : class;
 
 		void Unregister<TService>() where TService : class;
