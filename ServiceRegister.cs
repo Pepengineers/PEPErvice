@@ -3,10 +3,20 @@ using PEPEngineers.PEPErvice.Interfaces;
 
 namespace PEPEngineers.PEPErvice
 {
+	public static class ServiceHub
+	{
+		private static readonly CachedInstanceHub Hub = new();
+		public static IRegister Register => Hub;
+		public static ILocator Locator => Hub;
+	}
+
 	public static class ServiceRegister
 	{
-		private static readonly CachedInstanceDI Di = new CachedInstanceDI();
-		public static ILocator Locator => Di;
-		public static IRegister Register => Di;
+		public static IRegister Register => ServiceHub.Register;
+	}
+
+	public static class ServiceLocator
+	{
+		public static ILocator Locator => ServiceHub.Locator;
 	}
 }

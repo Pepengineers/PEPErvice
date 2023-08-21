@@ -28,7 +28,7 @@ namespace PEPEngineers.PEPErvice.Tests
 		public void RegisterService()
 		{
 			ServiceRegister.Register.Register<ITestService>(new TestService());
-			var service = ServiceRegister.Locator.Resolve<ITestService>();
+			var service = ServiceLocator.Locator.Resolve<ITestService>();
 
 			Assert.IsNotNull(service);
 			Assert.IsInstanceOf<TestService>(service);
@@ -49,7 +49,7 @@ namespace PEPEngineers.PEPErvice.Tests
 
 			yield return null;
 
-			var service = ServiceRegister.Locator.Resolve<ITestService>();
+			var service = ServiceLocator.Locator.Resolve<ITestService>();
 			Assert.IsNotNull(service);
 			Assert.IsInstanceOf<UnityTestService>(service);
 			Assert.AreSame(service, gameService);
@@ -61,7 +61,7 @@ namespace PEPEngineers.PEPErvice.Tests
 			var di = ServiceRegister.Register;
 			di.Bind<ITestService>(() => new TestService());
 
-			var service = ServiceRegister.Locator.Resolve<ITestService>();
+			var service = ServiceLocator.Locator.Resolve<ITestService>();
 			Assert.IsNotNull(service);
 			Assert.IsInstanceOf<TestService>(service);
 		}
@@ -75,7 +75,7 @@ namespace PEPEngineers.PEPErvice.Tests
 
 			yield return null;
 
-			var service = ServiceRegister.Locator.Resolve<ITestService>();
+			var service = ServiceLocator.Locator.Resolve<ITestService>();
 			Assert.IsNotNull(service);
 			Assert.IsInstanceOf<UnityTestService>(service);
 		}

@@ -24,8 +24,8 @@ namespace PEPEngineers.PEPErvice.Tests
 		[SetUp]
 		public void Setup()
 		{
-			di = ServiceRegister.Register;
-			locator = ServiceRegister.Locator;
+			di = ServiceHub.Register;
+			locator = ServiceLocator.Locator;
 		}
 
 		private IRegister di;

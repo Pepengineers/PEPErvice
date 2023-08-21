@@ -27,5 +27,6 @@ namespace PEPEngineers.PEPErvice.Interfaces
 		IReadOnlyCollection<object> Instances { get; }
 
 		TImpl Resolve<TImpl>() where TImpl : class;
+		ILocator Resolve<TImpl>(out TImpl value) where TImpl : class;
 	}
 }

@@ -17,7 +17,7 @@ namespace PEPEngineers.PEPErvice.Debug
 		{
 			Builder.Clear();
 			Builder.AppendLine("Services DUMP");
-			var services = ServiceRegister.Locator.Instances;
+			var services = ServiceLocator.Locator.Instances;
 			Builder.AppendLine($"Alive Services {services.Count}");
 			foreach (var service in services) Builder.AppendLine($"\t {service.GetType().FullName}");
 			UnityEngine.Debug.Log(Builder.ToString());

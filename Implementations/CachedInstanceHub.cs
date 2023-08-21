@@ -10,33 +10,18 @@ namespace PEPEngineers.PEPErvice.Implementations
 		public static Type Type { get; } = typeof(T);
 	}
 
-	internal class CachedInstanceDI : ILocator, IRegister
+	internal class CachedInstanceHub : ILocator, IRegister
 	{
 		private readonly Dictionary<Type, object> registeredServices = new();
 		private readonly HashSet<Type> sceneOnlyTypes = new();
 		private readonly Dictionary<Type, Func<object>> serviceFactories = new();
 
-		public CachedInstanceDI()
+		public CachedInstanceHub()
 		{
-			SceneManager.sceneUnloaded += OnSceneUnloaded;
+			SceneManager.activeSceneChanged += OnSceneChanged;
 		}
 
 		public IReadOnlyCollection<object> Instances => registeredServices.Values;
-
-		public IRegister Bind<TService>(Func<TService> resolver, Lifetime lifetime = Lifetime.Singleton)
-			where TService : class
-		{
-			if (resolver == null)
-				throw new ArgumentNullException();
-
-			var type = TypeFactory<TService>.Type;
-			serviceFactories[type] = resolver;
-
-			if (lifetime == Lifetime.Scene)
-				sceneOnlyTypes.Add(type);
-
-			return this;
-		}
 
 		public TService Resolve<TService>() where TService : class
 		{
@@ -53,6 +38,27 @@ namespace PEPEngineers.PEPErvice.Implementations
 			}
 
 			return null;
+		}
+
+		public ILocator Resolve<TImpl>(out TImpl value) where TImpl : class
+		{
+			value = Resolve<TImpl>();
+			return this;
+		}
+
+		public IRegister Bind<TService>(Func<TService> resolver, Lifetime lifetime = Lifetime.Singleton)
+			where TService : class
+		{
+			if (resolver == null)
+				throw new ArgumentNullException();
+
+			var type = TypeFactory<TService>.Type;
+			serviceFactories[type] = resolver;
+
+			if (lifetime == Lifetime.Scene)
+				sceneOnlyTypes.Add(type);
+
+			return this;
 		}
 
 		public void Unbind<TService>() where TService : class
@@ -84,30 +90,25 @@ namespace PEPEngineers.PEPErvice.Implementations
 			RemoveRegisteredType(type);
 		}
 
-		private void RemoveRegisteredType(Type type)
-		{
-			if (registeredServices.Remove(type, out var item) == false) return;
-
-			try
-			{
-				if(item is IService service)
-					service.Dispose();
-				
-				
-			}
-			catch (Exception e)
-			{
-				UnityEngine.Debug.LogException(e);
-			}
-		}
-
-		private void OnSceneUnloaded(Scene scene)
+		private void OnSceneChanged(Scene _, Scene __)
 		{
 			foreach (var sceneOnlyType in sceneOnlyTypes)
-			{
 				RemoveRegisteredType(sceneOnlyType);
-			}
 			sceneOnlyTypes.Clear();
+		}
+
+		private void RemoveRegisteredType(Type type)
+		{
+			if (registeredServices.Remove(type, out var item))
+				try
+				{
+					if (item is IService service)
+						service.Dispose();
+				}
+				catch (Exception e)
+				{
+					UnityEngine.Debug.LogException(e);
+				}
 		}
 	}
 }
