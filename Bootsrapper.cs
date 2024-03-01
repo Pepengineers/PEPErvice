@@ -3,7 +3,9 @@ using System.Linq;
 using PEPEngineers.PEPErvice.Extensions;
 using PEPEngineers.PEPErvice.Interfaces;
 using PEPEngineers.PEPErvice.Runtime;
+#if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
+#endif
 using UnityEngine;
 using UnityEngine.Assertions;
 
