@@ -50,19 +50,17 @@ namespace PEPEngineers.PEPErvice
 
 		private void OnValidate()
 		{
-			staticServices.Remove(null);
 			foreach (var scriptableService in staticServices)
+			{
+				Assert.IsNotNull(scriptableService);
 				Assert.IsTrue(scriptableService.Is<IService>());
-			staticServices = staticServices
-				.OrderBy(s => s.name)
-				.ToList();
+			}
 
-			runtimeServices.Remove(null);
 			foreach (var runtimeService in runtimeServices)
+			{
+				Assert.IsNotNull(runtimeService);
 				Assert.IsTrue(runtimeService.Is<IService>());
-			runtimeServices = runtimeServices
-				.OrderBy(s => s.name)
-				.ToList();
+			}
 
 			Construct();
 		}
