@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections;
+using DetectiveAsylum.Tests.Services.Objects;
 using NUnit.Framework;
-using PEPEngineers.PEPErvice.Tests.Objects;
+using PEPEngineers.PEPErvice;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-namespace PEPEngineers.PEPErvice.Tests
+namespace DetectiveAsylum.Tests.Services
 {
 	[RequiresPlayMode(false)]
 	internal class ServiceLocatorTests
@@ -13,22 +14,22 @@ namespace PEPEngineers.PEPErvice.Tests
 		[SetUp]
 		public void SetUp()
 		{
-			ServiceRegister.Register.Unregister<ITestService>();
-			ServiceRegister.Register.Unbind<ITestService>();
+			AllServices.Register.Unregister<ITestService>();
+			AllServices.Register.Unbind<ITestService>();
 		}
 
 		[TearDown]
 		public void TearDown()
 		{
-			ServiceRegister.Register.Unregister<ITestService>();
-			ServiceRegister.Register.Unbind<ITestService>();
+			AllServices.Register.Unregister<ITestService>();
+			AllServices.Register.Unbind<ITestService>();
 		}
 
 		[Test]
 		public void RegisterService()
 		{
-			ServiceRegister.Register.Register<ITestService>(new TestService());
-			var service = ServiceLocator.Locator.Resolve<ITestService>();
+			AllServices.Register.Register<ITestService>(new TestService());
+			var service = AllServices.Locator.Resolve<ITestService>();
 
 			Assert.IsNotNull(service);
 			Assert.IsInstanceOf<TestService>(service);
@@ -37,31 +38,31 @@ namespace PEPEngineers.PEPErvice.Tests
 		[Test]
 		public void CheckNullService()
 		{
-			Assert.Throws<ArgumentNullException>(() => ServiceRegister.Register.Register<ITestService>(null));
+			Assert.Throws<ArgumentNullException>(() => AllServices.Register.Register<ITestService>(null));
 		}
 
 		[UnityTest]
 		[RequiresPlayMode]
 		public IEnumerator CheckGameService()
 		{
-			var gameService = new GameObject("Test").AddComponent<UnityTestService>();
-			ServiceRegister.Register.Register<ITestService>(gameService);
+			var gameService = new GameObject("Test").AddComponent<UnityTestSingleton>();
+			AllServices.Register.Register<ITestService>(gameService);
 
 			yield return null;
 
-			var service = ServiceLocator.Locator.Resolve<ITestService>();
+			var service = AllServices.Locator.Resolve<ITestService>();
 			Assert.IsNotNull(service);
-			Assert.IsInstanceOf<UnityTestService>(service);
+			Assert.IsInstanceOf<UnityTestSingleton>(service);
 			Assert.AreSame(service, gameService);
 		}
 
 		[Test]
 		public void CheckDIBinding()
 		{
-			var di = ServiceRegister.Register;
+			var di = AllServices.Register;
 			di.Bind<ITestService>(() => new TestService());
 
-			var service = ServiceLocator.Locator.Resolve<ITestService>();
+			var service = AllServices.Locator.Resolve<ITestService>();
 			Assert.IsNotNull(service);
 			Assert.IsInstanceOf<TestService>(service);
 		}
@@ -70,14 +71,14 @@ namespace PEPEngineers.PEPErvice.Tests
 		[RequiresPlayMode]
 		public IEnumerator CheckDIFactory()
 		{
-			var di = ServiceRegister.Register;
-			di.Bind<ITestService>(() => new GameObject().AddComponent<UnityTestService>());
+			var di = AllServices.Register;
+			di.Bind<ITestService>(() => new GameObject().AddComponent<UnityTestSingleton>());
 
 			yield return null;
 
-			var service = ServiceLocator.Locator.Resolve<ITestService>();
+			var service = AllServices.Locator.Resolve<ITestService>();
 			Assert.IsNotNull(service);
-			Assert.IsInstanceOf<UnityTestService>(service);
+			Assert.IsInstanceOf<UnityTestSingleton>(service);
 		}
 	}
 }

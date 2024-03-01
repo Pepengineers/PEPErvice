@@ -1,10 +1,12 @@
 using System.Collections;
 using NUnit.Framework;
+using PEPEngineers.PEPErvice;
+using PEPEngineers.PEPErvice.Data;
 using PEPEngineers.PEPErvice.Interfaces;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 
-namespace PEPEngineers.PEPErvice.Tests
+namespace DetectiveAsylum.Tests.Services
 {
 	public class Service : IService
 	{
@@ -24,8 +26,8 @@ namespace PEPEngineers.PEPErvice.Tests
 		[SetUp]
 		public void Setup()
 		{
-			di = ServiceHub.Register;
-			locator = ServiceLocator.Locator;
+			di = AllServices.Register;
+			locator = AllServices.Locator;
 		}
 
 		private IRegister di;

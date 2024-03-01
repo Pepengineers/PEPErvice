@@ -1,13 +1,10 @@
-﻿using System.Text;
-
-#if UNITY_EDITOR
-
+﻿#if UNITY_EDITOR
+using System.Text;
 using UnityEditor;
-#endif
+using UnityEngine;
 
-namespace PEPEngineers.PEPErvice.Debug
+namespace PEPEngineers.PEPErvice.Editor
 {
-#if UNITY_EDITOR
 	internal static class DebugServiceLocator
 	{
 		private static readonly StringBuilder Builder = new();
@@ -17,11 +14,11 @@ namespace PEPEngineers.PEPErvice.Debug
 		{
 			Builder.Clear();
 			Builder.AppendLine("Services DUMP");
-			var services = ServiceLocator.Locator.Instances;
+			var services = AllServices.Locator.Instances;
 			Builder.AppendLine($"Alive Services {services.Count}");
 			foreach (var service in services) Builder.AppendLine($"\t {service.GetType().FullName}");
-			UnityEngine.Debug.Log(Builder.ToString());
+			Debug.Log(Builder.ToString());
 		}
 	}
-#endif
 }
+#endif

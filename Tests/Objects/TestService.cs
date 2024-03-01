@@ -1,4 +1,4 @@
-﻿namespace PEPEngineers.PEPErvice.Tests.Objects
+﻿namespace DetectiveAsylum.Tests.Services.Objects
 {
 	public class TestService : ITestService
 	{
