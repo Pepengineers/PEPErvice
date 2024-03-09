@@ -8,7 +8,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 {
 	public abstract class InstanceService<TService> : InstanceService where TService : class, IService
 	{
-		internal sealed override IRegister Register(IRegister register)
+		public sealed override IRegister Register(IRegister register)
 		{
 			Assert.IsTrue(this.Is<TService>());
 			return register.Register<TService>(this as TService);
@@ -22,6 +22,6 @@ namespace PEPEngineers.PEPErvice.Runtime
 			Destroy(this);
 		}
 
-		internal abstract IRegister Register(IRegister register);
+		public abstract IRegister Register(IRegister register);
 	}
 }

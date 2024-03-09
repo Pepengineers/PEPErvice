@@ -25,7 +25,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 			Destroy(this);
 		}
 
-		protected internal abstract IRegister Register(in IRegister register, Func<IService> factory);
+		public abstract IRegister Register(in IRegister register, Func<IService> factory);
 	}
 
 	public abstract class RuntimeService<TService> : RuntimeService
@@ -69,7 +69,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 			AllServices.Register.Unregister<TService>();
 		}
 
-		protected internal sealed override IRegister Register(in IRegister register, Func<IService> factory)
+		public sealed override IRegister Register(in IRegister register, Func<IService> factory)
 		{
 			return register.Bind<TService>(() =>
 			{
