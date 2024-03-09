@@ -12,6 +12,9 @@
     "pepe",
     "optimization"
   ],
+  "author": {
+	  "name": "PEPengineers"
+  },
   "category": "game tool",
   "dependencies": {},
   "samples": []
