@@ -11,8 +11,8 @@ namespace PEPEngineers.PEPErvice.Runtime
 		[SerializeField] private Lifetime lifetime = Lifetime.Singleton;
 		[SerializeField] private bool spawnOnLoad;
 
-		internal Lifetime Lifetime => lifetime;
-		internal bool SpawnOnLoad => spawnOnLoad;
+		public Lifetime Lifetime => lifetime;
+		public bool SpawnOnLoad => spawnOnLoad;
 		protected bool IsApplicationQuitting { get; private set; }
 
 		private void OnApplicationQuit()
