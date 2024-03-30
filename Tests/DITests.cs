@@ -1,8 +1,8 @@
 using System.Collections;
 using NUnit.Framework;
-using PEPEngineers.PEPErvice;
 using PEPEngineers.PEPErvice.Data;
 using PEPEngineers.PEPErvice.Interfaces;
+using PEPEngineers.PEPErvice.Runtime;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 
@@ -26,9 +26,11 @@ namespace DetectiveAsylum.Tests.Services
 		[SetUp]
 		public void Setup()
 		{
-			di = AllServices.Register;
-			locator = AllServices.Locator;
+			di = AllServices;
+			locator = AllServices;
 		}
+
+		private readonly ServiceCache AllServices = new();
 
 		private IRegister di;
 		private ILocator locator;
@@ -56,7 +58,7 @@ namespace DetectiveAsylum.Tests.Services
 		public void RegisterTest()
 		{
 			IService service = new Service();
-			di.Register<IService>(service);
+			di.Register(service);
 			var registeredService = locator.Resolve<IService>();
 			Assert.AreEqual(service, registeredService);
 		}
@@ -76,7 +78,7 @@ namespace DetectiveAsylum.Tests.Services
 		public void UnregisterTest()
 		{
 			IService service = new Service();
-			di.Register<IService>(service);
+			di.Register(service);
 			di.Unregister<IService>();
 			var registeredService = locator.Resolve<IService>();
 			Assert.IsNull(registeredService);

@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 
 namespace PEPEngineers.PEPErvice.Runtime
 {
-	internal sealed class ServiceCache : ILocator, IRegister
+	public sealed class ServiceCache : ILocator, IRegister
 	{
 		private readonly Dictionary<Type, IService> registeredServices = new();
 		private readonly HashSet<Type> sceneOnlyTypes = new();

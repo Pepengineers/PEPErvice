@@ -44,7 +44,6 @@ namespace PEPEngineers.PEPErvice.Runtime
 				Debug.Log($"#{TypeCache<TService>.Value.Name}# Created", this);
 #endif
 				instance = GetComponent<TService>();
-				AllServices.Register.Register(instance, Lifetime);
 
 				if (Lifetime == Lifetime.Singleton)
 					DontDestroyOnLoad(this);
@@ -66,7 +65,6 @@ namespace PEPEngineers.PEPErvice.Runtime
 #endif
 			OnDestroyed();
 			instance = default;
-			AllServices.Register.Unregister<TService>();
 		}
 
 		public sealed override IRegister Register(in IRegister register, Func<IService> factory)

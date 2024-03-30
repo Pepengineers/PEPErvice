@@ -3,6 +3,7 @@ using System.Collections;
 using DetectiveAsylum.Tests.Services.Objects;
 using NUnit.Framework;
 using PEPEngineers.PEPErvice;
+using PEPEngineers.PEPErvice.Runtime;
 using UnityEngine;
 using UnityEngine.TestTools;
 
@@ -11,25 +12,27 @@ namespace DetectiveAsylum.Tests.Services
 	[RequiresPlayMode(false)]
 	internal class ServiceLocatorTests
 	{
+		private ServiceCache AllServices = new();
+		
 		[SetUp]
 		public void SetUp()
 		{
-			AllServices.Register.Unregister<ITestService>();
-			AllServices.Register.Unbind<ITestService>();
+			AllServices.Unregister<ITestService>();
+			AllServices.Unbind<ITestService>();
 		}
 
 		[TearDown]
 		public void TearDown()
 		{
-			AllServices.Register.Unregister<ITestService>();
-			AllServices.Register.Unbind<ITestService>();
+			AllServices.Unregister<ITestService>();
+			AllServices.Unbind<ITestService>();
 		}
 
 		[Test]
 		public void RegisterService()
 		{
-			AllServices.Register.Register<ITestService>(new TestService());
-			var service = AllServices.Locator.Resolve<ITestService>();
+			AllServices.Register<ITestService>(new TestService());
+			var service = AllServices.Resolve<ITestService>();
 
 			Assert.IsNotNull(service);
 			Assert.IsInstanceOf<TestService>(service);
@@ -38,7 +41,7 @@ namespace DetectiveAsylum.Tests.Services
 		[Test]
 		public void CheckNullService()
 		{
-			Assert.Throws<ArgumentNullException>(() => AllServices.Register.Register<ITestService>(null));
+			Assert.Throws<ArgumentNullException>(() => AllServices.Register<ITestService>(null));
 		}
 
 		[UnityTest]
@@ -46,11 +49,11 @@ namespace DetectiveAsylum.Tests.Services
 		public IEnumerator CheckGameService()
 		{
 			var gameService = new GameObject("Test").AddComponent<UnityTestSingleton>();
-			AllServices.Register.Register<ITestService>(gameService);
+			AllServices.Register<ITestService>(gameService);
 
 			yield return null;
 
-			var service = AllServices.Locator.Resolve<ITestService>();
+			var service = AllServices.Resolve<ITestService>();
 			Assert.IsNotNull(service);
 			Assert.IsInstanceOf<UnityTestSingleton>(service);
 			Assert.AreSame(service, gameService);
@@ -59,10 +62,10 @@ namespace DetectiveAsylum.Tests.Services
 		[Test]
 		public void CheckDIBinding()
 		{
-			var di = AllServices.Register;
+			var di = AllServices;
 			di.Bind<ITestService>(() => new TestService());
 
-			var service = AllServices.Locator.Resolve<ITestService>();
+			var service = AllServices.Resolve<ITestService>();
 			Assert.IsNotNull(service);
 			Assert.IsInstanceOf<TestService>(service);
 		}
@@ -71,12 +74,12 @@ namespace DetectiveAsylum.Tests.Services
 		[RequiresPlayMode]
 		public IEnumerator CheckDIFactory()
 		{
-			var di = AllServices.Register;
+			var di = AllServices;
 			di.Bind<ITestService>(() => new GameObject().AddComponent<UnityTestSingleton>());
 
 			yield return null;
 
-			var service = AllServices.Locator.Resolve<ITestService>();
+			var service = AllServices.Resolve<ITestService>();
 			Assert.IsNotNull(service);
 			Assert.IsInstanceOf<UnityTestSingleton>(service);
 		}
