@@ -2,7 +2,7 @@
 
 namespace DetectiveAsylum.Tests.Services.Objects
 {
-	public class UnityTestSingleton : RuntimeService<ITestService>, ITestService
+	public class UnityTestSingleton : SceneService<ITestService>, ITestService
 	{
 	}
 }

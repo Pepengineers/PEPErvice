@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace PEPEngineers.PEPErvice.Runtime
 {
-	public abstract class RuntimeService : MonoBehaviour, IService
+	public abstract class SceneService : MonoBehaviour, IService
 	{
 		[SerializeField] private Lifetime lifetime = Lifetime.Singleton;
 		[SerializeField] private bool spawnOnLoad;
@@ -28,7 +28,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 		public abstract IRegister Register(in IRegister register, Func<IService> factory);
 	}
 
-	public abstract class RuntimeService<TService> : RuntimeService
+	public abstract class SceneService<TService> : SceneService
 		where TService : IService
 	{
 		private static TService instance;
@@ -71,7 +71,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 		{
 			return register.Bind<TService>(() =>
 			{
-				var existServices = FindObjectsByType<RuntimeService>(FindObjectsSortMode.None);
+				var existServices = FindObjectsByType<SceneService>(FindObjectsSortMode.None);
 				foreach (var existService in existServices)
 					if (existService.TryGetComponent<TService>(out var service))
 						return service;
