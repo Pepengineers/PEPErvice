@@ -6,7 +6,7 @@ using UnityEngine.Assertions;
 
 namespace PEPEngineers.PEPErvice.Runtime
 {
-	public abstract class InstanceService<TService> : InstanceService where TService : class, IService
+	public abstract class GameService<TService> : GameService where TService : class, IService
 	{
 		public sealed override IRegister Register(IRegister register)
 		{
@@ -15,7 +15,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 		}
 	}
 
-	public abstract class InstanceService : ScriptableObject, IService
+	public abstract class GameService : ScriptableObject, IService
 	{
 		void IDisposable.Dispose()
 		{
