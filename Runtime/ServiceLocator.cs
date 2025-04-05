@@ -132,6 +132,24 @@ namespace PEPEngineers.PEPErvice.Runtime
 
             autoCreatedServices.Clear();
         }
+		
+		private static bool Is<T>(object item)
+        {
+#if UNITY_EDITOR
+            if (ReferenceEquals(item, null))
+                return false;
+
+            return item switch
+            {
+                T => true,
+                GameObject go => go.TryGetComponent<T>(out _),
+                Component component => component.TryGetComponent<T>(out _),
+                _ => false
+            };
+#else
+			return item is T;
+#endif
+        }
         
         private static void DestroyService(UnityEngine.Object obj)
         {
@@ -151,11 +169,11 @@ namespace PEPEngineers.PEPErvice.Runtime
         {
             foreach (var scriptableService in staticServices)
                 if (scriptableService != null)
-                    Assert.IsTrue(scriptableService.Is<IService>());
+                    Assert.IsTrue(Is<IService>(scriptableService));
 
             foreach (var sceneService in sceneServices)
                 if (sceneService != null)
-                    Assert.IsTrue(sceneService.Is<IService>());
+                    Assert.IsTrue(Is<IService>(sceneService));
 
             foreach (var service in staticServices)
             {
