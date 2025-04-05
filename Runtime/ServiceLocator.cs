@@ -356,7 +356,8 @@ namespace PEPEngineers.PEPErvice.Runtime
         {
             var service = Instantiate(prefab);
             service.name = $"<{prefab.name}>";
-            var serviceInstance = service.GetComponentAsserted<SceneService>();
+            var serviceInstance = service.GetComponent<SceneService>();
+			Assert.IsNotNull(serviceInstance);
 
             if (createParentForSceneServices == false) return serviceInstance;
 
@@ -387,7 +388,8 @@ namespace PEPEngineers.PEPErvice.Runtime
                 if (sceneServicePrefab == null)
                     continue;
 
-                var services = sceneServicePrefab.GetComponentsAsserted<SceneService>();
+                var services = sceneServicePrefab.GetComponents<SceneService>();
+				Assert.IsNotNull(services);
                 foreach (var service in services)
                     service.Register(this, () => CreateService(sceneServicePrefab.gameObject));
             }
