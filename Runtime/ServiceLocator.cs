@@ -127,10 +127,24 @@ namespace PEPEngineers.PEPErvice.Runtime
             foreach (var service in autoCreatedServices)
             {
                 if (service == null) continue;
-                service.Destroy();
+                DestroyService(service);
             }
 
             autoCreatedServices.Clear();
+        }
+        
+        private static void DestroyService(UnityEngine.Object obj)
+        {
+            if (obj == null) return;
+
+#if UNITY_EDITOR
+            if (Application.isPlaying && !EditorApplication.isPaused)
+                UnityEngine.Object.Destroy(obj);
+            else
+                UnityEngine.Object.DestroyImmediate(obj);
+#else
+            UnityEngine.Object.Destroy(obj);
+#endif
         }
 
         protected virtual void OnValidate()
