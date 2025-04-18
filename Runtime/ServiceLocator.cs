@@ -337,7 +337,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 
             var services = FindObjectsByType<SceneService>(FindObjectsSortMode.None);
             foreach (var sceneService in instance.sceneServices)
-                if (sceneService.SpawnOnLoad)
+                if (sceneService && sceneService.SpawnOnLoad)
                 {
                     var existOnScene = false;
                     foreach (var existService in services)
@@ -354,6 +354,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 
         private IService CreateService(GameObject prefab)
         {
+            Assert.IsNotNull(prefab);
             var service = Instantiate(prefab);
             service.name = $"<{prefab.name}>";
             var serviceInstance = service.GetComponent<SceneService>();
