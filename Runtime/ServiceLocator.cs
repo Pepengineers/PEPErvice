@@ -32,9 +32,9 @@ namespace PEPEngineers.PEPErvice.Runtime
         [PropertySpace(5, 10)]
         [Searchable]
         [InlineEditor]
-        [AssetList(Path = "GameAssets", AutoPopulate = true)]
 #endif
         private List<GameService> staticServices = new();
+        protected IReadOnlyCollection<GameService> StaticServices => staticServices;
 
         [SerializeField]
 #if ODIN_INSPECTOR
@@ -42,9 +42,9 @@ namespace PEPEngineers.PEPErvice.Runtime
         [PropertySpace(5, 10)]
         [Searchable]
         [InlineEditor]
-        [AssetList(Path = "GameAssets", AutoPopulate = true)]
 #endif
         private List<SceneService> sceneServices = new();
+        protected IReadOnlyCollection<SceneService> SceneServices => sceneServices;
 
         [SerializeField]
 #if ODIN_INSPECTOR
@@ -69,6 +69,7 @@ namespace PEPEngineers.PEPErvice.Runtime
         [PropertySpace(5, 25)]
 #endif
         private readonly Dictionary<Type, IService> registeredServices = new();
+        protected IReadOnlyDictionary<Type, IService> RegisteredServices => registeredServices;
 
 #if ODIN_INSPECTOR
         [TitleGroup("Locator")] [PropertyOrder(100)] [ShowInInspector] [ReadOnly]
