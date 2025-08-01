@@ -19,7 +19,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 		public IReadOnlyDictionary<Type, Func<IService>> ServiceFactories => serviceFactories;
 		public IReadOnlyCollection<Type> SceneOnlyTypes => sceneOnlyTypes;
 
-		public TService Get<TService>() where TService : IService
+		public TService GetService<TService>() where TService : IService
 		{
 			var type = TypeCache<TService>.Value;
 
@@ -36,13 +36,13 @@ namespace PEPEngineers.PEPErvice.Runtime
 			return default;
 		}
 
-		public ILocator Get<TService>(out TService value) where TService : IService
+		public ILocator GetService<TService>(out TService value) where TService : IService
 		{
-			value = Get<TService>();
+			value = GetService<TService>();
 			return this;
 		}
 
-		public IRegister Bind<TService>(Func<IService> resolver, Lifetime lifetime) where TService : IService
+		public IRegister BindService<TService>(Func<IService> resolver, Lifetime lifetime) where TService : IService
 		{
 			Assert.IsNotNull(resolver);
 			var type = TypeCache<TService>.Value;
@@ -54,14 +54,14 @@ namespace PEPEngineers.PEPErvice.Runtime
 			return this;
 		}
 
-		public void Unbind<TService>() where TService : IService
+		public void UnbindService<TService>() where TService : IService
 		{
 			var type = TypeCache<TService>.Value;
 			serviceFactories.Remove(type);
 			RemoveRegisteredType(type);
 		}
 
-		public IRegister Register<TService>([NotNull] TService service, Lifetime lifetime) where TService : IService
+		public IRegister RegisterService<TService>([NotNull] TService service, Lifetime lifetime) where TService : IService
 		{
 			var type = TypeCache<TService>.Value;
 			registeredServices[type] = service;
@@ -72,7 +72,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 			return this;
 		}
 
-		public void Unregister<TService>() where TService : IService
+		public void UnregisterService<TService>() where TService : IService
 		{
 			var type = TypeCache<TService>.Value;
 			sceneOnlyTypes.Remove(type);

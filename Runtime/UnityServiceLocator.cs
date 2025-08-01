@@ -139,40 +139,40 @@ namespace PEPEngineers.PEPErvice.Runtime
 			Construct();
 		}
 
-		public TService Get<TService>() where TService : IService
+		public TService GetService<TService>() where TService : IService
 		{
 			Debug.Log($"{nameof(UnityServiceLocator)} Get Service {typeof(TService).Name}");
-			return serviceLocator.Get<TService>();
+			return serviceLocator.GetService<TService>();
 		}
 
-		public ILocator Get<TService>(out TService value) where TService : IService
+		public ILocator GetService<TService>(out TService value) where TService : IService
 		{
 			Debug.Log($"{nameof(UnityServiceLocator)} Get Service {typeof(TService).Name}");
-			return serviceLocator.Get(out value);
+			return serviceLocator.GetService(out value);
 		}
 
-		public IRegister Bind<TService>(Func<IService> resolver, Lifetime lifetime = Lifetime.Singleton) where TService : IService
+		public IRegister BindService<TService>(Func<IService> resolver, Lifetime lifetime = Lifetime.Singleton) where TService : IService
 		{
 			Debug.Log($"{nameof(UnityServiceLocator)} Bind Service {typeof(TService).Name}");
-			return serviceLocator.Bind<TService>(resolver, lifetime);
+			return serviceLocator.BindService<TService>(resolver, lifetime);
 		}
 
-		public void Unbind<TService>() where TService : IService
+		public void UnbindService<TService>() where TService : IService
 		{
 			Debug.Log($"{nameof(UnityServiceLocator)} Unbind Service {typeof(TService).Name}");
-			serviceLocator.Unbind<TService>();
+			serviceLocator.UnbindService<TService>();
 		}
 
-		public IRegister Register<TService>(TService service, Lifetime lifetime = Lifetime.Singleton) where TService : IService
+		public IRegister RegisterService<TService>(TService service, Lifetime lifetime = Lifetime.Singleton) where TService : IService
 		{
 			Debug.Log($"{nameof(UnityServiceLocator)} Register Service {typeof(TService).Name}");
-			return serviceLocator.Register(service, lifetime);
+			return serviceLocator.RegisterService(service, lifetime);
 		}
 
-		public void Unregister<TService>() where TService : IService
+		public void UnregisterService<TService>() where TService : IService
 		{
 			Debug.Log($"{nameof(UnityServiceLocator)} Unregister Service {typeof(TService).Name}");
-			serviceLocator.Unregister<TService>();
+			serviceLocator.UnregisterService<TService>();
 		}
 
 

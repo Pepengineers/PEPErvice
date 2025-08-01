@@ -11,7 +11,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 		public sealed override IRegister Register(IRegister register)
 		{
 			Assert.IsTrue(this.Is<TService>());
-			return register.Register(this as TService);
+			return register.RegisterService(this as TService);
 		}
 	}
 

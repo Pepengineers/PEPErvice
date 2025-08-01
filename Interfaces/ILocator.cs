@@ -5,7 +5,7 @@ namespace PEPEngineers.PEPErvice.Interfaces
 {
 	public interface ILocator
 	{
-		TService Get<TService>() where TService : IService;
-		ILocator Get<TService>(out TService value) where TService : IService;
+		TService GetService<TService>() where TService : IService;
+		ILocator GetService<TService>(out TService value) where TService : IService;
 	}
 }
