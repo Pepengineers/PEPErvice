@@ -28,8 +28,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 		public abstract IRegister Register(in IRegister register, Func<IService> factory);
 	}
 
-	public abstract class SceneService<TService> : SceneService
-		where TService : IService
+	public abstract class SceneService<TService> : SceneService where TService : IService
 	{
 		private static TService instance;
 

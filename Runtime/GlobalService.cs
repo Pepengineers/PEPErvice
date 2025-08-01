@@ -6,16 +6,16 @@ using UnityEngine.Assertions;
 
 namespace PEPEngineers.PEPErvice.Runtime
 {
-	public abstract class GameService<TService> : GameService where TService : class, IService
+	public abstract class GlobalService<TService> : GlobalService where TService : class, IService
 	{
 		public sealed override IRegister Register(IRegister register)
 		{
 			Assert.IsTrue(this.Is<TService>());
-			return register.Register<TService>(this as TService);
+			return register.Register(this as TService);
 		}
 	}
 
-	public abstract class GameService : ScriptableObject, IService
+	public abstract class GlobalService : ScriptableObject, IService
 	{
 		void IDisposable.Dispose()
 		{

@@ -6,8 +6,6 @@ namespace PEPEngineers.PEPErvice.Interfaces
 {
 	public interface IRegister
 	{
-		static IRegister Instance => ServiceLocator.Instance;
-		
 		IRegister Bind<TService>(Func<IService> resolver, Lifetime lifetime = Lifetime.Singleton)
 			where TService : IService;
 		
