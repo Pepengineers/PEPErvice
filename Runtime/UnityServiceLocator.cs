@@ -55,7 +55,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 		private Transform gameParent;
 		private Transform localSceneParent;
 		private ServiceLocator serviceLocator = new();
-		public UnityServiceLocator Instance { get; private set; }
+		public static UnityServiceLocator Instance { get; private set; }
 
 #if ODIN_INSPECTOR
 		[TitleGroup("Locator")]
@@ -241,7 +241,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 				return;
 			}
 
-			serviceLocator.Instance = serviceLocator;
+			Instance = serviceLocator;
 
 			var services = FindObjectsByType<SceneService>(FindObjectsSortMode.None);
 			foreach (var sceneService in serviceLocator.sceneServices)
