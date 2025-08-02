@@ -182,8 +182,11 @@ namespace PEPEngineers.PEPErvice.Runtime
 		{
 			var preloadedAssets = PlayerSettings.GetPreloadedAssets();
 			foreach (var asset in preloadedAssets)
-				if (asset is UnityServiceLocator)
+				if (asset is UnityServiceLocator serviceLocator)
+				{
+					Instance = serviceLocator;
 					return;
+				}
 
 			var type = AppDomain.CurrentDomain.GetAssemblies()
 				.SelectMany(a => a.GetTypes()).FirstOrDefault(t =>
@@ -217,7 +220,14 @@ namespace PEPEngineers.PEPErvice.Runtime
 
 		private static bool TryFindInstance(out UnityServiceLocator value)
 		{
+			if (Instance)
+			{
+				value = Instance;
+				return true;
+			}
+
 			value = FindAnyObjectByType<UnityServiceLocator>();
+			Instance = value;
 			return value != null;
 		}
 
