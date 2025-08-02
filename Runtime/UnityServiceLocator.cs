@@ -55,7 +55,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 		private Transform gameParent;
 		private Transform localSceneParent;
 		private ServiceLocator serviceLocator = new();
-		public static UnityServiceLocator Instance { get; private set; }
+		protected static UnityServiceLocator Instance { get; private set; }
 
 #if ODIN_INSPECTOR
 		[TitleGroup("Locator")]
