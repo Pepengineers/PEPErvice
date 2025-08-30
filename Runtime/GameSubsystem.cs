@@ -17,7 +17,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 		public sealed override IRegister Register(IRegister register)
 		{
 			Assert.IsTrue(this.Is<TSubsystem>());
-			return register.RegisterService<TSubsystem>(this as TSubsystem);
+			return register.RegisterSystem<TSubsystem>(this as TSubsystem);
 		}
 
 		protected virtual void OnInitialized()

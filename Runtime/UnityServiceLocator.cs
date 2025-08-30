@@ -140,40 +140,40 @@ namespace PEPEngineers.PEPErvice.Runtime
 			Construct();
 		}
 
-		public TSystem GeTSystem<TSystem>() where TSystem : ISubsystem
+		public TSystem GetSystem<TSystem>() where TSystem : ISubsystem
 		{
 			Debug.Log($"{nameof(UnityServiceLocator)} Get Service {typeof(TSystem).Name}");
-			return serviceLocator.GeTSystem<TSystem>();
+			return serviceLocator.GetSystem<TSystem>();
 		}
 
-		public ILocator GeTSystem<TSystem>(out TSystem value) where TSystem : ISubsystem
+		public ILocator GetSystem<TSystem>(out TSystem value) where TSystem : ISubsystem
 		{
 			Debug.Log($"{nameof(UnityServiceLocator)} Get Service {typeof(TSystem).Name}");
-			return serviceLocator.GeTSystem(out value);
+			return serviceLocator.GetSystem(out value);
 		}
 
-		public IRegister BindService<TSystem>(Func<ISubsystem> resolver, Lifetime lifetime = Lifetime.Singleton) where TSystem : ISubsystem
+		public IRegister BindSystem<TSystem>(Func<ISubsystem> resolver, Lifetime lifetime = Lifetime.Singleton) where TSystem : ISubsystem
 		{
 			Debug.Log($"{nameof(UnityServiceLocator)} Bind Service {typeof(TSystem).Name}");
-			return serviceLocator.BindService<TSystem>(resolver, lifetime);
+			return serviceLocator.BindSystem<TSystem>(resolver, lifetime);
 		}
 
-		public void UnbindService<TSystem>() where TSystem : ISubsystem
+		public void UnbindSystem<TSystem>() where TSystem : ISubsystem
 		{
 			Debug.Log($"{nameof(UnityServiceLocator)} Unbind Service {typeof(TSystem).Name}");
-			serviceLocator.UnbindService<TSystem>();
+			serviceLocator.UnbindSystem<TSystem>();
 		}
 
-		public IRegister RegisterService<TSystem>(TSystem service, Lifetime lifetime = Lifetime.Singleton) where TSystem : ISubsystem
+		public IRegister RegisterSystem<TSystem>(TSystem service, Lifetime lifetime = Lifetime.Singleton) where TSystem : ISubsystem
 		{
 			Debug.Log($"{nameof(UnityServiceLocator)} Register Service {typeof(TSystem).Name}");
-			return serviceLocator.RegisterService(service, lifetime);
+			return serviceLocator.RegisterSystem(service, lifetime);
 		}
 
-		public void UnregisterService<TSystem>() where TSystem : ISubsystem
+		public void UnregisterSystem<TSystem>() where TSystem : ISubsystem
 		{
 			Debug.Log($"{nameof(UnityServiceLocator)} Unregister Service {typeof(TSystem).Name}");
-			serviceLocator.UnregisterService<TSystem>();
+			serviceLocator.UnregisterSystem<TSystem>();
 		}
 
 

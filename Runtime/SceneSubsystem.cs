@@ -69,7 +69,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 
 		public sealed override IRegister Register(in IRegister register, Func<ISubsystem> factory)
 		{
-			return register.BindService<TService>(() =>
+			return register.BindSystem<TService>(() =>
 			{
 				var existServices = FindObjectsByType<SceneSubsystem>(FindObjectsSortMode.None);
 				foreach (var existService in existServices)
