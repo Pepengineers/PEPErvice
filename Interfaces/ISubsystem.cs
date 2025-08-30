@@ -3,11 +3,11 @@ using PEPEngineers.PEPErvice.Runtime;
 
 namespace PEPEngineers.PEPErvice.Interfaces
 {
-	public interface IService : IDisposable
+	public interface ISubsystem : IDisposable
 	{
 	}
 	
-	public interface IService<T> : IService where T : IService
+	public interface ISubsystem<T> : ISubsystem where T : ISubsystem
 	{
 		static T Instance => ServiceLocator.Instance.Resolve<T>();
 	}

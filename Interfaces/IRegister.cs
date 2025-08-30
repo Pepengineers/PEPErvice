@@ -8,14 +8,14 @@ namespace PEPEngineers.PEPErvice.Interfaces
 	{
 		static IRegister Instance => ServiceLocator.Instance;
 		
-		IRegister Bind<TService>(Func<IService> resolver, Lifetime lifetime = Lifetime.Singleton)
-			where TService : IService;
+		IRegister Bind<TSubsystem>(Func<ISubsystem> resolver, Lifetime lifetime = Lifetime.Singleton)
+			where TSubsystem : ISubsystem;
 		
-		void Unbind<TService>() where TService : IService;
+		void Unbind<TSubsystem>() where TSubsystem : ISubsystem;
 		
-		IRegister Register<TService>(TService service, Lifetime lifetime = Lifetime.Singleton)
-			where TService : IService;
+		IRegister Register<TSubsystem>(TSubsystem service, Lifetime lifetime = Lifetime.Singleton)
+			where TSubsystem : ISubsystem;
 
-		void Unregister<TService>() where TService : IService;
+		void Unregister<TSubsystem>() where TSubsystem : ISubsystem;
 	}
 }

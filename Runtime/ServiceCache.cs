@@ -10,9 +10,9 @@ namespace PEPEngineers.PEPErvice.Runtime
 {
 	public sealed class ServiceCache : ILocator, IRegister
 	{
-		private readonly Dictionary<Type, IService> registeredServices = new();
+		private readonly Dictionary<Type, ISubsystem> registeredServices = new();
 		private readonly HashSet<Type> sceneOnlyTypes = new();
-		private readonly Dictionary<Type, Func<IService>> serviceFactories = new();
+		private readonly Dictionary<Type, Func<ISubsystem>> serviceFactories = new();
 
 		public ServiceCache()
 		{
@@ -21,33 +21,33 @@ namespace PEPEngineers.PEPErvice.Runtime
 
 		public IReadOnlyCollection<object> Instances => registeredServices.Values;
 
-		public TService Resolve<TService>() where TService : IService
+		public TSubsystem Resolve<TSubsystem>() where TSubsystem : ISubsystem
 		{
-			var type = TypeFactory<TService>.Type;
+			var type = TypeFactory<TSubsystem>.Type;
 
 			if (registeredServices.TryGetValue(type, out var service) && service != default)
-				return (TService)service;
+				return (TSubsystem)service;
 
 			if (serviceFactories.TryGetValue(type, out var factory))
 			{
 				service = factory();
 				registeredServices[type] = service;
-				return (TService)service;
+				return (TSubsystem)service;
 			}
 
 			return default;
 		}
 
-		public ILocator Resolve<TService>(out TService value) where TService : IService
+		public ILocator Resolve<TSubsystem>(out TSubsystem value) where TSubsystem : ISubsystem
 		{
-			value = Resolve<TService>();
+			value = Resolve<TSubsystem>();
 			return this;
 		}
 
-		public IRegister Bind<TService>([NotNull] Func<IService> resolver, Lifetime lifetime = Lifetime.Singleton)
-			where TService : IService
+		public IRegister Bind<TSubsystem>([NotNull] Func<ISubsystem> resolver, Lifetime lifetime = Lifetime.Singleton)
+			where TSubsystem : ISubsystem
 		{
-			var type = TypeFactory<TService>.Type;
+			var type = TypeFactory<TSubsystem>.Type;
 			serviceFactories[type] = resolver;
 
 			if (lifetime == Lifetime.Scene)
@@ -56,17 +56,17 @@ namespace PEPEngineers.PEPErvice.Runtime
 			return this;
 		}
 
-		public void Unbind<TService>() where TService : IService
+		public void Unbind<TSubsystem>() where TSubsystem : ISubsystem
 		{
-			var type = TypeFactory<TService>.Type;
+			var type = TypeFactory<TSubsystem>.Type;
 			serviceFactories.Remove(type);
 			RemoveRegisteredType(type);
 		}
 
-		public IRegister Register<TService>([NotNull] TService service, Lifetime lifetime = Lifetime.Singleton)
-			where TService : IService
+		public IRegister Register<TSubsystem>([NotNull] TSubsystem service, Lifetime lifetime = Lifetime.Singleton)
+			where TSubsystem : ISubsystem
 		{
-			var type = TypeFactory<TService>.Type;
+			var type = TypeFactory<TSubsystem>.Type;
 			registeredServices[type] = service;
 
 			if (lifetime == Lifetime.Scene)
@@ -75,9 +75,9 @@ namespace PEPEngineers.PEPErvice.Runtime
 			return this;
 		}
 
-		public void Unregister<TService>() where TService : IService
+		public void Unregister<TSubsystem>() where TSubsystem : ISubsystem
 		{
-			var type = TypeFactory<TService>.Type;
+			var type = TypeFactory<TSubsystem>.Type;
 			sceneOnlyTypes.Remove(type);
 			RemoveRegisteredType(type);
 		}

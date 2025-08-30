@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace PEPEngineers.PEPErvice.Runtime
 {
-	public abstract class SceneService : MonoBehaviour, IService
+	public abstract class SceneSubsystem : MonoBehaviour, ISubsystem
 	{
 		[SerializeField] private Lifetime lifetime = Lifetime.Singleton;
 		[SerializeField] private bool spawnOnLoad;
@@ -25,13 +25,13 @@ namespace PEPEngineers.PEPErvice.Runtime
 			Destroy(this);
 		}
 
-		public abstract IRegister Register(in IRegister register, Func<IService> factory);
+		public abstract IRegister Register(in IRegister register, Func<ISubsystem> factory);
 	}
 
-	public abstract class SceneService<TService> : SceneService
-		where TService : IService
+	public abstract class SceneSubsystem<TSubsystem> : SceneSubsystem
+		where TSubsystem : ISubsystem
 	{
-		private static TService instance;
+		private static TSubsystem instance;
 
 		private bool CanInitialize =>
 			ReferenceEquals(instance, null) && instance == null && IsApplicationQuitting == false;
@@ -41,9 +41,9 @@ namespace PEPEngineers.PEPErvice.Runtime
 			if (CanInitialize)
 			{
 #if DEBUG
-				Debug.Log($"#{TypeCache<TService>.Value.Name}# Created", this);
+				Debug.Log($"#{TypeCache<TSubsystem>.Value.Name}# Created", this);
 #endif
-				instance = GetComponent<TService>();
+				instance = GetComponent<TSubsystem>();
 
 				if (Lifetime == Lifetime.Singleton)
 					DontDestroyOnLoad(this);
@@ -61,19 +61,19 @@ namespace PEPEngineers.PEPErvice.Runtime
 			if (ReferenceEquals(instance, this) == false)
 				return;
 #if DEBUG
-			Debug.Log($"#{TypeCache<TService>.Value.Name}# Destroyed", this);
+			Debug.Log($"#{TypeCache<TSubsystem>.Value.Name}# Destroyed", this);
 #endif
 			OnDestroyed();
 			instance = default;
 		}
 
-		public sealed override IRegister Register(in IRegister register, Func<IService> factory)
+		public sealed override IRegister Register(in IRegister register, Func<ISubsystem> factory)
 		{
-			return register.Bind<TService>(() =>
+			return register.Bind<TSubsystem>(() =>
 			{
-				var existServices = FindObjectsByType<SceneService>(FindObjectsSortMode.None);
+				var existServices = FindObjectsByType<SceneSubsystem>(FindObjectsSortMode.None);
 				foreach (var existService in existServices)
-					if (existService.TryGetComponent<TService>(out var service))
+					if (existService.TryGetComponent<TSubsystem>(out var service))
 						return service;
 				return factory();
 			}, Lifetime);
