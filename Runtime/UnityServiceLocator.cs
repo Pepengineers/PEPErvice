@@ -29,7 +29,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 		[Searchable]
 		[InlineEditor]
 #endif
-		private List<GlobalService> staticServices = new();
+		private List<GameSubsystem> staticServices = new();
 
 		[SerializeField]
 #if ODIN_INSPECTOR
@@ -38,7 +38,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 		[Searchable]
 		[InlineEditor]
 #endif
-		private List<SceneService> sceneServices = new();
+		private List<SceneSubsystem> sceneServices = new();
 
 		[SerializeField]
 #if ODIN_INSPECTOR
@@ -50,7 +50,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 #if ODIN_INSPECTOR
 		[TitleGroup("Register", order: 100)] [PropertySpace(5, 10)] [ShowInInspector] [InlineEditor]
 #endif
-		private readonly List<GlobalService> autoCreatedServices = new();
+		private readonly List<GameSubsystem> autoCreatedServices = new();
 
 		private Transform gameParent;
 		private Transform localSceneParent;
@@ -63,10 +63,10 @@ namespace PEPEngineers.PEPErvice.Runtime
 		[ShowInInspector]
 		[ReadOnly]
 #endif
-		protected IReadOnlyDictionary<Type, Func<IService>> serviceFactories => serviceLocator.ServiceFactories;
+		protected IReadOnlyDictionary<Type, Func<ISubsystem>> serviceFactories => serviceLocator.ServiceFactories;
 
-		protected IReadOnlyCollection<GlobalService> StaticServices => staticServices;
-		protected IReadOnlyCollection<SceneService> SceneServices => sceneServices;
+		protected IReadOnlyCollection<GameSubsystem> StaticServices => staticServices;
+		protected IReadOnlyCollection<SceneSubsystem> SceneServices => sceneServices;
 
 #if ODIN_INSPECTOR
 		[TitleGroup("Locator")]
@@ -78,7 +78,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 		[ReadOnly]
 		[PropertySpace(5, 25)]
 #endif
-		protected IReadOnlyDictionary<Type, IService> RegisteredServices => serviceLocator.RegisteredServices;
+		protected IReadOnlyDictionary<Type, ISubsystem> RegisteredServices => serviceLocator.RegisteredServices;
 
 		protected virtual void Awake()
 		{
@@ -90,7 +90,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 		{
 			var types = (from assembly in AppDomain.CurrentDomain.GetAssemblies()
 				from type in assembly.GetTypes()
-				where typeof(GlobalService).IsAssignableFrom(type) && type.IsAbstract == false
+				where typeof(GameSubsystem).IsAssignableFrom(type) && type.IsAbstract == false
 				select type).ToList();
 
 			foreach (var sceneService in staticServices)
@@ -100,7 +100,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 			}
 
 			autoCreatedServices.Clear();
-			foreach (var type in types) autoCreatedServices.Add(CreateInstance(type) as GlobalService);
+			foreach (var type in types) autoCreatedServices.Add(CreateInstance(type) as GameSubsystem);
 
 			Construct();
 		}
@@ -122,11 +122,11 @@ namespace PEPEngineers.PEPErvice.Runtime
 		{
 			foreach (var scriptableService in staticServices)
 				if (scriptableService != null)
-					Assert.IsTrue(scriptableService.Is<IService>());
+					Assert.IsTrue(scriptableService.Is<ISubsystem>());
 
 			foreach (var sceneService in sceneServices)
 				if (sceneService != null)
-					Assert.IsTrue(sceneService.Is<IService>());
+					Assert.IsTrue(sceneService.Is<ISubsystem>());
 
 			foreach (var service in staticServices)
 			{
@@ -139,37 +139,37 @@ namespace PEPEngineers.PEPErvice.Runtime
 			Construct();
 		}
 
-		public TService GetService<TService>() where TService : IService
+		public TService GetService<TService>() where TService : ISubsystem
 		{
 			Debug.Log($"{nameof(UnityServiceLocator)} Get Service {typeof(TService).Name}");
 			return serviceLocator.GetService<TService>();
 		}
 
-		public ILocator GetService<TService>(out TService value) where TService : IService
+		public ILocator GetService<TService>(out TService value) where TService : ISubsystem
 		{
 			Debug.Log($"{nameof(UnityServiceLocator)} Get Service {typeof(TService).Name}");
 			return serviceLocator.GetService(out value);
 		}
 
-		public IRegister BindService<TService>(Func<IService> resolver, Lifetime lifetime = Lifetime.Singleton) where TService : IService
+		public IRegister BindService<TService>(Func<ISubsystem> resolver, Lifetime lifetime = Lifetime.Singleton) where TService : ISubsystem
 		{
 			Debug.Log($"{nameof(UnityServiceLocator)} Bind Service {typeof(TService).Name}");
 			return serviceLocator.BindService<TService>(resolver, lifetime);
 		}
 
-		public void UnbindService<TService>() where TService : IService
+		public void UnbindService<TService>() where TService : ISubsystem
 		{
 			Debug.Log($"{nameof(UnityServiceLocator)} Unbind Service {typeof(TService).Name}");
 			serviceLocator.UnbindService<TService>();
 		}
 
-		public IRegister RegisterService<TService>(TService service, Lifetime lifetime = Lifetime.Singleton) where TService : IService
+		public IRegister RegisterService<TService>(TService service, Lifetime lifetime = Lifetime.Singleton) where TService : ISubsystem
 		{
 			Debug.Log($"{nameof(UnityServiceLocator)} Register Service {typeof(TService).Name}");
 			return serviceLocator.RegisterService(service, lifetime);
 		}
 
-		public void UnregisterService<TService>() where TService : IService
+		public void UnregisterService<TService>() where TService : ISubsystem
 		{
 			Debug.Log($"{nameof(UnityServiceLocator)} Unregister Service {typeof(TService).Name}");
 			serviceLocator.UnregisterService<TService>();
@@ -253,7 +253,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 
 			Instance = serviceLocator;
 
-			var services = FindObjectsByType<SceneService>(FindObjectsSortMode.None);
+			var services = FindObjectsByType<SceneSubsystem>(FindObjectsSortMode.None);
 			foreach (var sceneService in serviceLocator.sceneServices)
 				if (sceneService && sceneService.SpawnOnLoad)
 				{
@@ -270,12 +270,12 @@ namespace PEPEngineers.PEPErvice.Runtime
 				}
 		}
 
-		private IService CreateService(GameObject prefab)
+		private ISubsystem CreateService(GameObject prefab)
 		{
 			Assert.IsNotNull(prefab);
 			var service = Instantiate(prefab);
 			service.name = $"<{prefab.name}>";
-			var serviceInstance = service.GetComponent<SceneService>();
+			var serviceInstance = service.GetComponent<SceneSubsystem>();
 			Assert.IsNotNull(serviceInstance);
 
 			if (createParentForSceneServices == false) return serviceInstance;
@@ -307,7 +307,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 				if (sceneServicePrefab == null)
 					continue;
 
-				var services = sceneServicePrefab.GetComponents<SceneService>();
+				var services = sceneServicePrefab.GetComponents<SceneSubsystem>();
 				Assert.IsNotNull(services);
 				foreach (var service in services)
 				{

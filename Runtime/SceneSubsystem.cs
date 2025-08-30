@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace PEPEngineers.PEPErvice.Runtime
 {
-	public abstract class SceneService : MonoBehaviour, IService
+	public abstract class SceneSubsystem : MonoBehaviour, ISubsystem
 	{
 		[SerializeField] private Lifetime lifetime = Lifetime.Singleton;
 		[SerializeField] private bool spawnOnLoad;
@@ -22,13 +22,13 @@ namespace PEPEngineers.PEPErvice.Runtime
 
 		void IDisposable.Dispose()
 		{
-			Destroy(this);
+			this.Destroy();
 		}
 
-		public abstract IRegister Register(in IRegister register, Func<IService> factory);
+		public abstract IRegister Register(in IRegister register, Func<ISubsystem> factory);
 	}
 
-	public abstract class SceneService<TService> : SceneService where TService : IService
+	public abstract class SceneSubsystem<TService> : SceneSubsystem where TService : ISubsystem
 	{
 		private static TService instance;
 
@@ -51,7 +51,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 			}
 			else
 			{
-				DestroyImmediate(gameObject);
+				this.Destroy();
 			}
 		}
 
@@ -66,11 +66,11 @@ namespace PEPEngineers.PEPErvice.Runtime
 			instance = default;
 		}
 
-		public sealed override IRegister Register(in IRegister register, Func<IService> factory)
+		public sealed override IRegister Register(in IRegister register, Func<ISubsystem> factory)
 		{
 			return register.BindService<TService>(() =>
 			{
-				var existServices = FindObjectsByType<SceneService>(FindObjectsSortMode.None);
+				var existServices = FindObjectsByType<SceneSubsystem>(FindObjectsSortMode.None);
 				foreach (var existService in existServices)
 					if (existService.TryGetComponent<TService>(out var service))
 						return service;
