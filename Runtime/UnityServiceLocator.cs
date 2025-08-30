@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
 using Debug = UnityEngine.Debug;
+using ISubsystem = PEPEngineers.PEPErvice.Interfaces.ISubsystem;
 
 #if UNITY_EDITOR
 using UnityEditor;
