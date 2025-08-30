@@ -132,48 +132,48 @@ namespace PEPEngineers.PEPErvice.Runtime
 			foreach (var service in staticServices)
 			{
 				if (service == null) continue;
-				var existService =
+				var exisTSystem =
 					autoCreatedServices.FirstOrDefault(s => s != null && s.GetType() == service.GetType());
-				if (existService) autoCreatedServices.Remove(existService);
+				if (exisTSystem) autoCreatedServices.Remove(exisTSystem);
 			}
 
 			Construct();
 		}
 
-		public TService GetService<TService>() where TService : ISubsystem
+		public TSystem GeTSystem<TSystem>() where TSystem : ISubsystem
 		{
-			Debug.Log($"{nameof(UnityServiceLocator)} Get Service {typeof(TService).Name}");
-			return serviceLocator.GetService<TService>();
+			Debug.Log($"{nameof(UnityServiceLocator)} Get Service {typeof(TSystem).Name}");
+			return serviceLocator.GeTSystem<TSystem>();
 		}
 
-		public ILocator GetService<TService>(out TService value) where TService : ISubsystem
+		public ILocator GeTSystem<TSystem>(out TSystem value) where TSystem : ISubsystem
 		{
-			Debug.Log($"{nameof(UnityServiceLocator)} Get Service {typeof(TService).Name}");
-			return serviceLocator.GetService(out value);
+			Debug.Log($"{nameof(UnityServiceLocator)} Get Service {typeof(TSystem).Name}");
+			return serviceLocator.GeTSystem(out value);
 		}
 
-		public IRegister BindService<TService>(Func<ISubsystem> resolver, Lifetime lifetime = Lifetime.Singleton) where TService : ISubsystem
+		public IRegister BindService<TSystem>(Func<ISubsystem> resolver, Lifetime lifetime = Lifetime.Singleton) where TSystem : ISubsystem
 		{
-			Debug.Log($"{nameof(UnityServiceLocator)} Bind Service {typeof(TService).Name}");
-			return serviceLocator.BindService<TService>(resolver, lifetime);
+			Debug.Log($"{nameof(UnityServiceLocator)} Bind Service {typeof(TSystem).Name}");
+			return serviceLocator.BindService<TSystem>(resolver, lifetime);
 		}
 
-		public void UnbindService<TService>() where TService : ISubsystem
+		public void UnbindService<TSystem>() where TSystem : ISubsystem
 		{
-			Debug.Log($"{nameof(UnityServiceLocator)} Unbind Service {typeof(TService).Name}");
-			serviceLocator.UnbindService<TService>();
+			Debug.Log($"{nameof(UnityServiceLocator)} Unbind Service {typeof(TSystem).Name}");
+			serviceLocator.UnbindService<TSystem>();
 		}
 
-		public IRegister RegisterService<TService>(TService service, Lifetime lifetime = Lifetime.Singleton) where TService : ISubsystem
+		public IRegister RegisterService<TSystem>(TSystem service, Lifetime lifetime = Lifetime.Singleton) where TSystem : ISubsystem
 		{
-			Debug.Log($"{nameof(UnityServiceLocator)} Register Service {typeof(TService).Name}");
+			Debug.Log($"{nameof(UnityServiceLocator)} Register Service {typeof(TSystem).Name}");
 			return serviceLocator.RegisterService(service, lifetime);
 		}
 
-		public void UnregisterService<TService>() where TService : ISubsystem
+		public void UnregisterService<TSystem>() where TSystem : ISubsystem
 		{
-			Debug.Log($"{nameof(UnityServiceLocator)} Unregister Service {typeof(TService).Name}");
-			serviceLocator.UnregisterService<TService>();
+			Debug.Log($"{nameof(UnityServiceLocator)} Unregister Service {typeof(TSystem).Name}");
+			serviceLocator.UnregisterService<TSystem>();
 		}
 
 
@@ -259,9 +259,9 @@ namespace PEPEngineers.PEPErvice.Runtime
 				if (sceneService && sceneService.SpawnOnLoad)
 				{
 					var existOnScene = false;
-					foreach (var existService in services)
+					foreach (var exisTSystem in services)
 					{
-						if (existService.GetType() != sceneService.GetType()) continue;
+						if (exisTSystem.GetType() != sceneService.GetType()) continue;
 						existOnScene = true;
 						break;
 					}

@@ -3,6 +3,7 @@ using PEPEngineers.PEPErvice.Extensions;
 using PEPEngineers.PEPErvice.Interfaces;
 using UnityEngine;
 using UnityEngine.Assertions;
+using ISubsystem = PEPEngineers.PEPErvice.Interfaces.ISubsystem;
 
 namespace PEPEngineers.PEPErvice.Runtime
 {

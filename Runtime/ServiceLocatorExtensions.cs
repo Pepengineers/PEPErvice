@@ -1,5 +1,6 @@
 using UnityEditor;
 using UnityEngine;
+using ISubsystem = PEPEngineers.PEPErvice.Interfaces.ISubsystem;
 
 namespace PEPEngineers.PEPErvice.Runtime
 {

@@ -6,6 +6,7 @@ using PEPEngineers.PEPErvice.Extensions;
 using PEPEngineers.PEPErvice.Interfaces;
 using UnityEngine;
 using UnityEngine.Assertions;
+using ISubsystem = PEPEngineers.PEPErvice.Interfaces.ISubsystem;
 
 namespace PEPEngineers.PEPErvice.Runtime
 {
@@ -19,33 +20,33 @@ namespace PEPEngineers.PEPErvice.Runtime
 		public IReadOnlyDictionary<Type, Func<ISubsystem>> ServiceFactories => serviceFactories;
 		public IReadOnlyCollection<Type> SceneOnlyTypes => sceneOnlyTypes;
 
-		public TService GetService<TService>() where TService : ISubsystem
+		public TSystem GeTSystem<TSystem>() where TSystem : ISubsystem
 		{
-			var type = TypeCache<TService>.Value;
+			var type = TypeCache<TSystem>.Value;
 
 			if (registeredServices.TryGetValue(type, out var service) && service != null)
-				return (TService)service;
+				return (TSystem)service;
 
 			if (serviceFactories.TryGetValue(type, out var factory))
 			{
 				service = factory();
 				registeredServices[type] = service;
-				return (TService)service;
+				return (TSystem)service;
 			}
 
 			return default;
 		}
 
-		public ILocator GetService<TService>(out TService value) where TService : ISubsystem
+		public ILocator GeTSystem<TSystem>(out TSystem value) where TSystem : ISubsystem
 		{
-			value = GetService<TService>();
+			value = GeTSystem<TSystem>();
 			return this;
 		}
 
-		public IRegister BindService<TService>(Func<ISubsystem> resolver, Lifetime lifetime) where TService : ISubsystem
+		public IRegister BindService<TSystem>(Func<ISubsystem> resolver, Lifetime lifetime) where TSystem : ISubsystem
 		{
 			Assert.IsNotNull(resolver);
-			var type = TypeCache<TService>.Value;
+			var type = TypeCache<TSystem>.Value;
 			serviceFactories[type] = resolver;
 
 			if (lifetime == Lifetime.Scene)
@@ -54,16 +55,16 @@ namespace PEPEngineers.PEPErvice.Runtime
 			return this;
 		}
 
-		public void UnbindService<TService>() where TService : ISubsystem
+		public void UnbindService<TSystem>() where TSystem : ISubsystem
 		{
-			var type = TypeCache<TService>.Value;
+			var type = TypeCache<TSystem>.Value;
 			serviceFactories.Remove(type);
 			RemoveRegisteredType(type);
 		}
 
-		public IRegister RegisterService<TService>([NotNull] TService service, Lifetime lifetime) where TService : ISubsystem
+		public IRegister RegisterService<TSystem>([NotNull] TSystem service, Lifetime lifetime) where TSystem : ISubsystem
 		{
-			var type = TypeCache<TService>.Value;
+			var type = TypeCache<TSystem>.Value;
 			registeredServices[type] = service;
 
 			if (lifetime == Lifetime.Scene)
@@ -72,9 +73,9 @@ namespace PEPEngineers.PEPErvice.Runtime
 			return this;
 		}
 
-		public void UnregisterService<TService>() where TService : ISubsystem
+		public void UnregisterService<TSystem>() where TSystem : ISubsystem
 		{
-			var type = TypeCache<TService>.Value;
+			var type = TypeCache<TSystem>.Value;
 			sceneOnlyTypes.Remove(type);
 			RemoveRegisteredType(type);
 		}
