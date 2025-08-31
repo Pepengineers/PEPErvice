@@ -1,6 +1,10 @@
 using System;
 using PEPEngineers.PEPErvice.Extensions;
 using PEPEngineers.PEPErvice.Interfaces;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using UnityEngine;
 using UnityEngine.Assertions;
 using ISubsystem = PEPEngineers.PEPErvice.Interfaces.ISubsystem;
@@ -14,7 +18,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 		private bool CanInitialize =>
 			ReferenceEquals(instance, null) && instance == null && !IsApplicationQuitting;
 
-		public sealed override IRegister Register(IRegister register)
+		internal sealed override IRegister Register(IRegister register)
 		{
 			Assert.IsTrue(this.Is<TSubsystem>());
 			return register.RegisterSystem<TSubsystem>(this as TSubsystem);
@@ -26,17 +30,26 @@ namespace PEPEngineers.PEPErvice.Runtime
 
 		private void Awake()
 		{
+			string path = string.Empty;
+#if UNITY_EDITOR
+			path = AssetDatabase.GetAssetPath(this);
+#endif
 			if (CanInitialize)
 			{
 #if DEBUG
-				Debug.Log($"#{TypeCache<TSubsystem>.Value.Name}# Created", this);
+				Debug.Log($"#{TypeCache<TSubsystem>.Value.Name}# Created {path}", this);
 #endif
 				instance = this as TSubsystem;
+				UnityLocator.Instance.RegisterSystem(instance);
 
 				OnInitialized();
 			}
 			else
 			{
+
+#if DEBUG
+				Debug.LogWarning($"#{TypeCache<TSubsystem>.Value.Name}# Failed Initialize System {path}", this);
+#endif
 				this.Destroy();
 			}
 		}
@@ -56,6 +69,6 @@ namespace PEPEngineers.PEPErvice.Runtime
 			IsApplicationQuitting = true;
 		}
 
-		public abstract IRegister Register(IRegister register);
+		internal abstract IRegister Register(IRegister register);
 	}
 }
