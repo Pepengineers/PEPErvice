@@ -7,9 +7,9 @@ using ISubsystem = PEPEngineers.PEPErvice.Interfaces.ISubsystem;
 
 namespace PEPEngineers.PEPErvice.Runtime
 {
-	public abstract class SceneSubsystem<TService> : SceneSubsystem where TService : ISubsystem
+	public abstract class SceneSubsystem<T> : SceneSubsystem where T : ISubsystem
 	{
-		private static TService instance;
+		private static T instance;
 
 		private bool CanInitialize =>
 			ReferenceEquals(instance, null) && instance == null && !IsApplicationQuitting;
@@ -19,11 +19,11 @@ namespace PEPEngineers.PEPErvice.Runtime
 			if (CanInitialize)
 			{
 #if DEBUG
-				Debug.Log($"#{TypeCache<TService>.Value.Name}# Created", this);
+				Debug.Log($"#{TypeCache<T>.Value.Name}# Created", this);
 #endif
-				instance = GetComponent<TService>();
+				instance = GetComponent<T>();
 
-				UnityLocator.Instance.RegisterSystem(instance);
+				UnityLocator.Instance.RegisterSubsystem(instance);
 				
 				if (Lifetime == Lifetime.Singleton)
 					DontDestroyOnLoad(this);
@@ -41,7 +41,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 			if (!ReferenceEquals(instance, this))
 				return;
 #if DEBUG
-			Debug.Log($"#{TypeCache<TService>.Value.Name}# Destroyed", this);
+			Debug.Log($"#{TypeCache<T>.Value.Name}# Destroyed", this);
 #endif
 			OnDestroyed();
 			instance = default;
@@ -49,11 +49,11 @@ namespace PEPEngineers.PEPErvice.Runtime
 
 		internal sealed override IRegister Register(in IRegister register, Func<ISubsystem> factory)
 		{
-			return register.BindSystem<TService>(() =>
+			return register.BindSubsystem<T>(() =>
 			{
 				var existServices = FindObjectsByType<SceneSubsystem>(FindObjectsSortMode.None);
 				foreach (var existService in existServices)
-					if (existService.TryGetComponent<TService>(out var service))
+					if (existService.TryGetComponent<T>(out var service))
 						return service;
 				return factory();
 			}, Lifetime);

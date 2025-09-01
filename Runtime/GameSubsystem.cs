@@ -11,17 +11,17 @@ using ISubsystem = PEPEngineers.PEPErvice.Interfaces.ISubsystem;
 
 namespace PEPEngineers.PEPErvice.Runtime
 {
-	public abstract class GameSubsystem<TSubsystem> : GameSubsystem where TSubsystem : class, ISubsystem
+	public abstract class GameSubsystem<T> : GameSubsystem where T : class, ISubsystem
 	{
-		private static TSubsystem instance;
+		private static T instance;
 
 		private bool CanInitialize =>
 			ReferenceEquals(instance, null) && instance == null && !IsApplicationQuitting;
 
 		internal sealed override IRegister Register(IRegister register)
 		{
-			Assert.IsTrue(this.Is<TSubsystem>());
-			return register.RegisterSystem<TSubsystem>(this as TSubsystem);
+			Assert.IsTrue(this.Is<T>());
+			return register.RegisterSubsystem<T>(this as T);
 		}
 
 		protected virtual void OnInitialized()
@@ -37,10 +37,10 @@ namespace PEPEngineers.PEPErvice.Runtime
 			if (CanInitialize)
 			{
 #if DEBUG
-				Debug.Log($"#{TypeCache<TSubsystem>.Value.Name}# Created {path}", this);
+				Debug.Log($"#{TypeCache<T>.Value.Name}# Created {path}", this);
 #endif
-				instance = this as TSubsystem;
-				UnityLocator.Instance.RegisterSystem(instance);
+				instance = this as T;
+				UnityLocator.Instance.RegisterSubsystem(instance);
 
 				OnInitialized();
 			}
@@ -48,7 +48,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 			{
 
 #if DEBUG
-				Debug.LogWarning($"#{TypeCache<TSubsystem>.Value.Name}# Failed Initialize System {path}", this);
+				Debug.LogWarning($"#{TypeCache<T>.Value.Name}# Failed Initialize System {path}", this);
 #endif
 				this.Destroy();
 			}
