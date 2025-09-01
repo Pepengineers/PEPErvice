@@ -6,13 +6,13 @@ namespace PEPEngineers.PEPErvice.Interfaces
 	public interface IRegister
 	{
 		IRegister BindSubsystem(Type type, Func<ISubsystem> resolver, Lifetime lifetime = Lifetime.Singleton);
-		IRegister BindSubsystem<TSystem>(Func<ISubsystem> resolver, Lifetime lifetime = Lifetime.Singleton) where TSystem : ISubsystem;
+		IRegister BindSubsystem<T>(Func<ISubsystem> resolver, Lifetime lifetime = Lifetime.Singleton) where T : ISubsystem;
 
 		void UnbindSubsystem(Type type);
-		void UnbindSubsystem<TSystem>() where TSystem : ISubsystem;
+		void UnbindSubsystem<T>() where T : ISubsystem;
 
 		IRegister RegisterSubsystem(Type type, ISubsystem subsystem, Lifetime lifetime = Lifetime.Singleton);
-		IRegister RegisterSubsystem<TSystem>(TSystem service, Lifetime lifetime = Lifetime.Singleton) where TSystem : ISubsystem;
-		void UnregisterSystem<TSystem>() where TSystem : ISubsystem;
+		IRegister RegisterSubsystem<T>(T service, Lifetime lifetime = Lifetime.Singleton) where T : ISubsystem;
+		void UnregisterSystem<T>() where T : ISubsystem;
 	}
 }

@@ -38,18 +38,18 @@ namespace PEPEngineers.PEPErvice.Runtime
 			return null;
 		}
 
-		public TSystem GetSubsystem<TSystem>() where TSystem : ISubsystem
+		public T GetSubsystem<T>() where T : ISubsystem
 		{
-			var type = TypeCache<TSystem>.Value;
+			var type = TypeCache<T>.Value;
 			var system = GetSubsystem(type);
 			if (system != null)
-				return (TSystem)system;
+				return (T)system;
 			return default;
 		}
 
-		public ILocator GetSubsystem<TSystem>(out TSystem value) where TSystem : ISubsystem
+		public ILocator GetSubsystem<T>(out T value) where T : ISubsystem
 		{
-			value = GetSubsystem<TSystem>();
+			value = GetSubsystem<T>();
 			return this;
 		}
 
@@ -66,10 +66,10 @@ namespace PEPEngineers.PEPErvice.Runtime
 			return this;
 		}
 
-		public IRegister BindSubsystem<TSystem>(Func<ISubsystem> resolver, Lifetime lifetime) where TSystem : ISubsystem
+		public IRegister BindSubsystem<T>(Func<ISubsystem> resolver, Lifetime lifetime) where T : ISubsystem
 		{
 			Assert.IsNotNull(resolver);
-			var type = TypeCache<TSystem>.Value;
+			var type = TypeCache<T>.Value;
 			return BindSubsystem(type, resolver, lifetime);
 		}
 
@@ -81,9 +81,9 @@ namespace PEPEngineers.PEPErvice.Runtime
 			RemoveRegisteredType(type);
 		}
 
-		public void UnbindSubsystem<TSystem>() where TSystem : ISubsystem
+		public void UnbindSubsystem<T>() where T : ISubsystem
 		{
-			var type = TypeCache<TSystem>.Value;
+			var type = TypeCache<T>.Value;
 			UnbindSubsystem(type);
 		}
 
@@ -100,15 +100,15 @@ namespace PEPEngineers.PEPErvice.Runtime
 			return this;
 		}
 
-		public IRegister RegisterSubsystem<TSystem>([NotNull] TSystem service, Lifetime lifetime) where TSystem : ISubsystem
+		public IRegister RegisterSubsystem<T>([NotNull] T service, Lifetime lifetime) where T : ISubsystem
 		{
-			var type = TypeCache<TSystem>.Value;
+			var type = TypeCache<T>.Value;
 			return RegisterSubsystem(type, service, lifetime);
 		}
 
-		public void UnregisterSystem<TSystem>() where TSystem : ISubsystem
+		public void UnregisterSystem<T>() where T : ISubsystem
 		{
-			var type = TypeCache<TSystem>.Value;
+			var type = TypeCache<T>.Value;
 			sceneOnlyTypes.Remove(type);
 			RemoveRegisteredType(type);
 		}

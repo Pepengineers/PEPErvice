@@ -117,15 +117,15 @@ namespace PEPEngineers.PEPErvice.Runtime
 			return subsystemLocator.GetSubsystem(type);
 		}
 
-		public TSystem GetSubsystem<TSystem>() where TSystem : ISubsystem
+		public T GetSubsystem<T>() where T : ISubsystem
 		{
-			Debug.Log($"{nameof(UnityLocator)} Get System {typeof(TSystem).Name}");
-			return subsystemLocator.GetSubsystem<TSystem>();
+			Debug.Log($"{nameof(UnityLocator)} Get System {typeof(T).Name}");
+			return subsystemLocator.GetSubsystem<T>();
 		}
 
-		public ILocator GetSubsystem<TSystem>(out TSystem value) where TSystem : ISubsystem
+		public ILocator GetSubsystem<T>(out T value) where T : ISubsystem
 		{
-			Debug.Log($"{nameof(UnityLocator)} Get System {typeof(TSystem).Name}");
+			Debug.Log($"{nameof(UnityLocator)} Get System {typeof(T).Name}");
 			return subsystemLocator.GetSubsystem(out value);
 		}
 
@@ -137,11 +137,11 @@ namespace PEPEngineers.PEPErvice.Runtime
 			return subsystemLocator.BindSubsystem(type, resolver, lifetime);
 		}
 
-		public IRegister BindSubsystem<TSystem>(Func<ISubsystem> resolver, Lifetime lifetime = Lifetime.Singleton) where TSystem : ISubsystem
+		public IRegister BindSubsystem<T>(Func<ISubsystem> resolver, Lifetime lifetime = Lifetime.Singleton) where T : ISubsystem
 		{
 			Assert.IsNotNull(resolver);
-			Debug.Log($"{nameof(UnityLocator)} Bind System {typeof(TSystem).Name}");
-			return subsystemLocator.BindSubsystem<TSystem>(resolver, lifetime);
+			Debug.Log($"{nameof(UnityLocator)} Bind System {typeof(T).Name}");
+			return subsystemLocator.BindSubsystem<T>(resolver, lifetime);
 		}
 
 		public void UnbindSubsystem(Type type)
@@ -151,10 +151,10 @@ namespace PEPEngineers.PEPErvice.Runtime
 			subsystemLocator.UnbindSubsystem(type);
 		}
 
-		public void UnbindSubsystem<TSystem>() where TSystem : ISubsystem
+		public void UnbindSubsystem<T>() where T : ISubsystem
 		{
-			Debug.Log($"{nameof(UnityLocator)} Unbind System {typeof(TSystem).Name}");
-			subsystemLocator.UnbindSubsystem<TSystem>();
+			Debug.Log($"{nameof(UnityLocator)} Unbind System {typeof(T).Name}");
+			subsystemLocator.UnbindSubsystem<T>();
 		}
 
 		public IRegister RegisterSubsystem(Type type, ISubsystem subsystem, Lifetime lifetime = Lifetime.Singleton)
@@ -165,16 +165,16 @@ namespace PEPEngineers.PEPErvice.Runtime
 			return subsystemLocator.RegisterSubsystem(type, subsystem, lifetime);
 		}
 
-		public IRegister RegisterSubsystem<TSystem>(TSystem system, Lifetime lifetime = Lifetime.Singleton) where TSystem : ISubsystem
+		public IRegister RegisterSubsystem<T>(T system, Lifetime lifetime = Lifetime.Singleton) where T : ISubsystem
 		{
-			Debug.Log($"{nameof(UnityLocator)} Register System {typeof(TSystem).Name}");
+			Debug.Log($"{nameof(UnityLocator)} Register System {typeof(T).Name}");
 			return subsystemLocator.RegisterSubsystem(system, lifetime);
 		}
 
-		public void UnregisterSystem<TSystem>() where TSystem : ISubsystem
+		public void UnregisterSystem<T>() where T : ISubsystem
 		{
-			Debug.Log($"{nameof(UnityLocator)} Unregister System {typeof(TSystem).Name}");
-			subsystemLocator.UnregisterSystem<TSystem>();
+			Debug.Log($"{nameof(UnityLocator)} Unregister System {typeof(T).Name}");
+			subsystemLocator.UnregisterSystem<T>();
 		}
 
 

@@ -5,7 +5,7 @@ namespace PEPEngineers.PEPErvice.Interfaces
 	public interface ILocator
 	{
 		ISubsystem GetSubsystem(Type type);
-		TSystem GetSubsystem<TSystem>() where TSystem : ISubsystem;
-		ILocator GetSubsystem<TSystem>(out TSystem value) where TSystem : ISubsystem;
+		T GetSubsystem<T>() where T : ISubsystem;
+		ILocator GetSubsystem<T>(out T value) where T : ISubsystem;
 	}
 }
