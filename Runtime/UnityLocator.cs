@@ -32,7 +32,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 		[Searchable]
 		[InlineEditor]
 #endif
-		private List<GameSubsystem> gameSystems = new();
+		private List<GameSubsystem> gameSubsystems = new();
 
 		[FormerlySerializedAs("sceneServices")]
 		[SerializeField]
@@ -42,7 +42,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 		[Searchable]
 		[InlineEditor]
 #endif
-		private List<SceneSubsystem> sceneSystems = new();
+		private List<SceneSubsystem> sceneSubsystems = new();
 
 		[SerializeField]
 #if ODIN_INSPECTOR
@@ -53,9 +53,9 @@ namespace PEPEngineers.PEPErvice.Runtime
 
 		private Transform gameParent;
 		private Transform localSceneParent;
-		private SystemLocator systemLocator = new();
+		private SubsystemLocator subsystemLocator = new();
 
-		private Type[] systemTypes = Array.Empty<Type>();
+		private Type[] subsystemTypes = Array.Empty<Type>();
 		protected internal static UnityLocator Instance { get; private set; }
 
 #if ODIN_INSPECTOR
@@ -64,10 +64,10 @@ namespace PEPEngineers.PEPErvice.Runtime
 		[ShowInInspector]
 		[ReadOnly]
 #endif
-		protected internal IReadOnlyDictionary<Type, Func<ISubsystem>> SystemFactories => systemLocator.SystemFactories;
+		protected internal IReadOnlyDictionary<Type, Func<ISubsystem>> SystemFactories => subsystemLocator.SubsystemFactories;
 
-		protected internal IReadOnlyCollection<GameSubsystem> GameSystems => gameSystems;
-		protected internal IReadOnlyCollection<SceneSubsystem> SceneSystems => sceneSystems;
+		protected internal IReadOnlyCollection<GameSubsystem> GameSubsystems => gameSubsystems;
+		protected internal IReadOnlyCollection<SceneSubsystem> SceneSubsystems => sceneSubsystems;
 
 #if ODIN_INSPECTOR
 		[TitleGroup("Locator")]
@@ -79,7 +79,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 		[ReadOnly]
 		[PropertySpace(5, 25)]
 #endif
-		protected internal IReadOnlyDictionary<Type, ISubsystem> RegisteredSystems => systemLocator.RegisteredSystems;
+		protected internal IReadOnlyDictionary<Type, ISubsystem> RegisteredSystems => subsystemLocator.RegisteredSubsystems;
 
 		protected virtual void Awake()
 		{
@@ -99,82 +99,82 @@ namespace PEPEngineers.PEPErvice.Runtime
 
 		protected virtual void OnValidate()
 		{
-			foreach (var subsystem in gameSystems)
+			foreach (var subsystem in gameSubsystems)
 				if (subsystem != null)
 					Assert.IsTrue(subsystem.Is<ISubsystem>());
 
-			foreach (var subsystem in sceneSystems)
+			foreach (var subsystem in sceneSubsystems)
 				if (subsystem != null)
 					Assert.IsTrue(subsystem.Is<ISubsystem>());
 
 			Construct();
 		}
 
-		public ISubsystem GetSystem(Type type)
+		public ISubsystem GetSubsystem(Type type)
 		{
 			Assert.IsNotNull(type);
 			Debug.Log($"{nameof(UnityLocator)} Get System {type.Name}");
-			return systemLocator.GetSystem(type);
+			return subsystemLocator.GetSubsystem(type);
 		}
 
-		public TSystem GetSystem<TSystem>() where TSystem : ISubsystem
+		public T GetSubsystem<T>() where T : ISubsystem
 		{
-			Debug.Log($"{nameof(UnityLocator)} Get System {typeof(TSystem).Name}");
-			return systemLocator.GetSystem<TSystem>();
+			Debug.Log($"{nameof(UnityLocator)} Get System {typeof(T).Name}");
+			return subsystemLocator.GetSubsystem<T>();
 		}
 
-		public ILocator GetSystem<TSystem>(out TSystem value) where TSystem : ISubsystem
+		public ILocator GetSubsystem<T>(out T value) where T : ISubsystem
 		{
-			Debug.Log($"{nameof(UnityLocator)} Get System {typeof(TSystem).Name}");
-			return systemLocator.GetSystem(out value);
+			Debug.Log($"{nameof(UnityLocator)} Get System {typeof(T).Name}");
+			return subsystemLocator.GetSubsystem(out value);
 		}
 
-		public IRegister BindSystem(Type type, Func<ISubsystem> resolver, Lifetime lifetime = Lifetime.Singleton)
+		public IRegister BindSubsystem(Type type, Func<ISubsystem> resolver, Lifetime lifetime = Lifetime.Singleton)
 		{
 			Assert.IsNotNull(type);
 			Assert.IsNotNull(resolver);
 			Debug.Log($"{nameof(UnityLocator)} Bind System {type.Name}");
-			return systemLocator.BindSystem(type, resolver, lifetime);
+			return subsystemLocator.BindSubsystem(type, resolver, lifetime);
 		}
 
-		public IRegister BindSystem<TSystem>(Func<ISubsystem> resolver, Lifetime lifetime = Lifetime.Singleton) where TSystem : ISubsystem
+		public IRegister BindSubsystem<T>(Func<ISubsystem> resolver, Lifetime lifetime = Lifetime.Singleton) where T : ISubsystem
 		{
 			Assert.IsNotNull(resolver);
-			Debug.Log($"{nameof(UnityLocator)} Bind System {typeof(TSystem).Name}");
-			return systemLocator.BindSystem<TSystem>(resolver, lifetime);
+			Debug.Log($"{nameof(UnityLocator)} Bind System {typeof(T).Name}");
+			return subsystemLocator.BindSubsystem<T>(resolver, lifetime);
 		}
 
-		public void UnbindSystem(Type type)
+		public void UnbindSubsystem(Type type)
 		{
 			Assert.IsNotNull(type);
 			Debug.Log($"{nameof(UnityLocator)} Unbind System {type.Name}");
-			systemLocator.UnbindSystem(type);
+			subsystemLocator.UnbindSubsystem(type);
 		}
 
-		public void UnbindSystem<TSystem>() where TSystem : ISubsystem
+		public void UnbindSubsystem<T>() where T : ISubsystem
 		{
-			Debug.Log($"{nameof(UnityLocator)} Unbind System {typeof(TSystem).Name}");
-			systemLocator.UnbindSystem<TSystem>();
+			Debug.Log($"{nameof(UnityLocator)} Unbind System {typeof(T).Name}");
+			subsystemLocator.UnbindSubsystem<T>();
 		}
 
-		public IRegister RegisterSystem(Type type, ISubsystem subsystem, Lifetime lifetime = Lifetime.Singleton)
+		public IRegister RegisterSubsystem(Type type, ISubsystem subsystem, Lifetime lifetime = Lifetime.Singleton)
 		{
 			Assert.IsNotNull(type);
 			Assert.IsNotNull(subsystem);
 			Debug.Log($"{nameof(UnityLocator)} Register System {type.Name}");
-			return systemLocator.RegisterSystem(type, subsystem, lifetime);
+			return subsystemLocator.RegisterSubsystem(type, subsystem, lifetime);
 		}
 
-		public IRegister RegisterSystem<TSystem>(TSystem system, Lifetime lifetime = Lifetime.Singleton) where TSystem : ISubsystem
+		public IRegister RegisterSubsystem<T>(T system, Lifetime lifetime = Lifetime.Singleton) where T : ISubsystem
 		{
-			Debug.Log($"{nameof(UnityLocator)} Register System {typeof(TSystem).Name}");
-			return systemLocator.RegisterSystem(system, lifetime);
+			Debug.Log($"{nameof(UnityLocator)} Register System {typeof(T).Name}");
+			return subsystemLocator.RegisterSubsystem(system, lifetime);
 		}
 
-		public void UnregisterSystem<TSystem>() where TSystem : ISubsystem
+		public void UnregisterSystem<T>() where T : ISubsystem
 		{
-			Debug.Log($"{nameof(UnityLocator)} Unregister System {typeof(TSystem).Name}");
-			systemLocator.UnregisterSystem<TSystem>();
+			Debug.Log($"{nameof(UnityLocator)} Unregister System {typeof(T).Name}");
+			subsystemLocator.UnregisterSystem<T>();
 		}
 
 
@@ -218,7 +218,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 
 		private void OnSceneChanged(Scene _, Scene __)
 		{
-			systemLocator.RemoveSceneSystems();
+			subsystemLocator.RemoveSceneSystems();
 
 			localSceneParent.Destroy();
 			localSceneParent = null;
@@ -244,13 +244,13 @@ namespace PEPEngineers.PEPErvice.Runtime
 		protected void Construct()
 		{
 			Instance = this;
-			systemTypes = (from assembly in AppDomain.CurrentDomain.GetAssemblies()
+			subsystemTypes = (from assembly in AppDomain.CurrentDomain.GetAssemblies()
 				from type in assembly.GetTypes()
 				where typeof(ISubsystem).IsAssignableFrom(type) && !type.IsAbstract
 				select type).ToArray();
-			systemLocator.Clear();
-			RegisterGameSystems();
-			RegisterSceneSystems();
+			subsystemLocator.Clear();
+			RegisterGameSubsystems();
+			RegisterSceneSubsystems();
 		}
 
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -265,7 +265,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 			Instance = locator;
 
 			var existSystems = FindObjectsByType<SceneSubsystem>(FindObjectsSortMode.None);
-			foreach (var system in locator.sceneSystems)
+			foreach (var system in locator.sceneSubsystems)
 				if (system && system.SpawnOnLoad)
 				{
 					var existOnScene = false;
@@ -277,11 +277,11 @@ namespace PEPEngineers.PEPErvice.Runtime
 					}
 
 					if (!existOnScene)
-						locator.CreateSceneSystem(system.GetType(), () => Instantiate(system));
+						locator.CreateSceneSubsystem(system.GetType(), () => Instantiate(system));
 				}
 		}
 
-		private ISubsystem CreateSceneSystem(Type type, Func<SceneSubsystem> factory)
+		private ISubsystem CreateSceneSubsystem(Type type, Func<SceneSubsystem> factory)
 		{
 			Assert.IsNotNull(type);
 			Assert.IsNotNull(factory);
@@ -310,37 +310,37 @@ namespace PEPEngineers.PEPErvice.Runtime
 			return system;
 		}
 
-		private void RegisterSceneSystems()
+		private void RegisterSceneSubsystems()
 		{
-			var sceneTypes = (from t in systemTypes
+			var sceneTypes = (from t in subsystemTypes
 				where typeof(SceneSubsystem).IsAssignableFrom(t)
 				select t).ToList();
 
-			foreach (var systemPrefab in sceneSystems)
+			foreach (var systemPrefab in sceneSubsystems)
 			{
 				if (systemPrefab == null) continue;
 				sceneTypes.Remove(systemPrefab.GetType());
 
 				var systems = systemPrefab.GetComponents<SceneSubsystem>();
 				Assert.IsNotNull(systems);
-				foreach (var system in systems) system.Register(this, () => CreateSceneSystem(systemPrefab.GetType(), () => Instantiate(systemPrefab)));
+				foreach (var system in systems) system.Register(this, () => CreateSceneSubsystem(systemPrefab.GetType(), () => Instantiate(systemPrefab)));
 			}
 
 			foreach (var type in sceneTypes)
 			{
 				Debug.Log($"{nameof(UnityLocator)} Add Default Bind for {type.Name} system");
-				systemLocator.BindSystem(type,
-					() => CreateSceneSystem(type, () => new GameObject(type.Name).AddComponent(type) as SceneSubsystem));
+				subsystemLocator.BindSubsystem(type,
+					() => CreateSceneSubsystem(type, () => new GameObject(type.Name).AddComponent(type) as SceneSubsystem));
 			}
 		}
 
-		private void RegisterGameSystems()
+		private void RegisterGameSubsystems()
 		{
-			var existGameTypes = (from t in systemTypes
+			var existGameTypes = (from t in subsystemTypes
 				where typeof(GameSubsystem).IsAssignableFrom(t)
 				select t).ToList();
 
-			foreach (var gameSystem in gameSystems)
+			foreach (var gameSystem in gameSubsystems)
 			{
 				if (gameSystem == null) continue;
 				var type = gameSystem.GetType();
@@ -351,7 +351,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 			foreach (var type in existGameTypes)
 			{
 				Debug.Log($"{nameof(UnityLocator)} Add Default Bind for {type.Name} system");
-				systemLocator.BindSystem(type, () => CreateInstance(type) as GameSubsystem);
+				subsystemLocator.BindSubsystem(type, () => CreateInstance(type) as GameSubsystem);
 			}
 		}
 	}
