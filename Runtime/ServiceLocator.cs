@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using PEPEngineers.PEPErvice.Data;
+using PEPEngineers.PEPErvice.Extensions;
 using PEPEngineers.PEPErvice.Interfaces;
-using PEPEngineers.PEPErvice.Runtime;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
@@ -77,6 +77,7 @@ namespace PEPEngineers.PEPErvice.Runtime
         private readonly HashSet<Type> sceneOnlyTypes = new();
 
         private readonly Dictionary<Type, Func<IService>> serviceFactories = new();
+        private readonly HashSet<SceneService> createdSceneServices = new();
 
         private Transform gameParent;
         private Transform localSceneParent;
@@ -94,15 +95,18 @@ namespace PEPEngineers.PEPErvice.Runtime
 
         protected virtual void Awake()
         {
-            SceneManager.activeSceneChanged += OnSceneChanged;
-
             instance = this;
-            Construct();
         }
 
         protected virtual void OnEnable()
         {
             instance = this;
+            SceneManager.activeSceneChanged -= OnSceneChanged;
+            SceneManager.activeSceneChanged += OnSceneChanged;
+
+            ClearRegisteredServices();
+            foreach (var service in autoCreatedServices) DestroyService(service);
+            autoCreatedServices.Clear();
 
             var types = (from assembly in AppDomain.CurrentDomain.GetAssemblies()
                 from type in assembly.GetTypes()
@@ -115,15 +119,21 @@ namespace PEPEngineers.PEPErvice.Runtime
                 types.Remove(sceneService.GetType());
             }
 
-            autoCreatedServices.Clear();
             foreach (var type in types) autoCreatedServices.Add(CreateInstance(type) as GameService);
 
             Construct();
         }
 
+        protected virtual void OnDisable()
+        {
+            SceneManager.activeSceneChanged -= OnSceneChanged;
+        }
+
         protected virtual void OnDestroy()
         {
             SceneManager.activeSceneChanged -= OnSceneChanged;
+            ClearRegisteredServices();
+            if (instance == this) instance = null;
 
             foreach (var service in autoCreatedServices)
             {
@@ -157,7 +167,7 @@ namespace PEPEngineers.PEPErvice.Runtime
             if (obj == null) return;
 
 #if UNITY_EDITOR
-            if (Application.isPlaying && !EditorApplication.isPaused)
+            if (Application.isPlaying)
                 UnityEngine.Object.Destroy(obj);
             else
                 UnityEngine.Object.DestroyImmediate(obj);
@@ -176,12 +186,18 @@ namespace PEPEngineers.PEPErvice.Runtime
                 if (sceneService != null)
                     Assert.IsTrue(Is<IService>(sceneService));
 
+            if (Application.isPlaying) return;
+
             foreach (var service in staticServices)
             {
                 if (service == null) continue;
                 var existService =
                     autoCreatedServices.FirstOrDefault(s => s != null && s.GetType() == service.GetType());
-                if (existService) autoCreatedServices.Remove(existService);
+                if (existService)
+                {
+                    autoCreatedServices.Remove(existService);
+                    DestroyService(existService);
+                }
             }
 
             Construct();
@@ -191,14 +207,18 @@ namespace PEPEngineers.PEPErvice.Runtime
         {
             var type = TypeCache<TService>.Value;
 
-            if (registeredServices.TryGetValue(type, out var service) && service != null)
+            if (registeredServices.TryGetValue(type, out var service) && service.IsAlive())
                 return (TService)service;
+            registeredServices.Remove(type);
 
             if (serviceFactories.TryGetValue(type, out var factory))
             {
                 service = factory();
+                if (!service.IsAlive())
+                    throw new InvalidOperationException($"The factory for {type.FullName} returned a null, destroyed or disposed service.");
+                var result = (TService)service;
                 registeredServices[type] = service;
-                return (TService)service;
+                return result;
             }
 
             return default;
@@ -212,12 +232,16 @@ namespace PEPEngineers.PEPErvice.Runtime
 
         IRegister IRegister.Bind<TService>(Func<IService> resolver, Lifetime lifetime)
         {
-            Assert.IsNotNull(resolver);
+            Assert.IsNotNull(resolver, $"A factory is required for {typeof(TService).FullName}.");
+            if (resolver == null) throw new ArgumentNullException(nameof(resolver));
             var type = TypeCache<TService>.Value;
             serviceFactories[type] = resolver;
 
             if (lifetime == Lifetime.Scene)
                 sceneOnlyTypes.Add(type);
+            else
+                sceneOnlyTypes.Remove(type);
+            RemoveRegisteredType(type);
 
             return this;
         }
@@ -226,16 +250,21 @@ namespace PEPEngineers.PEPErvice.Runtime
         {
             var type = TypeCache<TService>.Value;
             serviceFactories.Remove(type);
+            sceneOnlyTypes.Remove(type);
             RemoveRegisteredType(type);
         }
 
         IRegister IRegister.Register<TService>([NotNull] TService service, Lifetime lifetime)
         {
+            if (!service.IsAlive()) throw new ArgumentNullException(nameof(service));
             var type = TypeCache<TService>.Value;
+            serviceFactories.Remove(type);
             registeredServices[type] = service;
 
             if (lifetime == Lifetime.Scene)
                 sceneOnlyTypes.Add(type);
+            else
+                sceneOnlyTypes.Remove(type);
 
             return this;
         }
@@ -243,6 +272,7 @@ namespace PEPEngineers.PEPErvice.Runtime
         void IRegister.Unregister<TService>()
         {
             var type = TypeCache<TService>.Value;
+            serviceFactories.Remove(type);
             sceneOnlyTypes.Remove(type);
             RemoveRegisteredType(type);
         }
@@ -262,34 +292,7 @@ namespace PEPEngineers.PEPErvice.Runtime
                 break;
             }
 
-            if (instance == null)
-            {
-                var type = AppDomain.CurrentDomain.GetAssemblies()
-                    .SelectMany(a => a.GetTypes()).FirstOrDefault(t =>
-                        typeof(GameService).IsAssignableFrom(t) && t.IsClass && !t.IsAbstract);
-                if (type == null)
-                {
-                    Debug.LogError($"Create class inherited from {nameof(GameService)}!");
-                    return;
-                }
-
-                var guids = AssetDatabase.FindAssets($"t:{type.Name}");
-                if (guids.Any())
-                {
-                    instance = (ServiceLocator)AssetDatabase.LoadAssetAtPath(
-                        AssetDatabase.GUIDToAssetPath(guids.First()), type);
-                }
-                else
-                {
-                    instance = CreateInstance(type) as ServiceLocator;
-                    AssetDatabase.CreateAsset(instance, $"Assets/{type.Name}");
-                    AssetDatabase.SaveAssets();
-                    PlayerSettings.SetPreloadedAssets(preloadedAssets.Concat(new[] { instance }).ToArray());
-                }
-            }
-
-            Assert.IsNotNull(instance);
-            instance.Construct();
+            Assert.IsNotNull(instance, $"Add a {nameof(ServiceLocator)} asset to Player Settings / Preloaded Assets.");
         }
 #endif
         private void OnSceneChanged(Scene _, Scene __)
@@ -297,16 +300,30 @@ namespace PEPEngineers.PEPErvice.Runtime
             foreach (var sceneOnlyType in sceneOnlyTypes)
                 RemoveRegisteredType(sceneOnlyType);
 
-            Destroy(localSceneParent);
+            foreach (var service in createdSceneServices)
+                if (service == null || service.Lifetime == Lifetime.Scene)
+                    DisposeRegisteredService(service);
+            createdSceneServices.RemoveWhere(service => service == null || service.IsDisposed);
+
+            if (localSceneParent != null) DestroyService(localSceneParent.gameObject);
             localSceneParent = null;
         }
 
         private void RemoveRegisteredType(in Type type)
         {
             if (registeredServices.Remove(type, out var service) == false) return;
+            DisposeRegisteredService(service);
+        }
+
+        private void DisposeRegisteredService(IService service)
+        {
+            if (!service.IsAlive()) return;
+            // Configured ScriptableObjects are borrowed assets; only auto-created ones are owned here.
+            if (service is GameService gameService && !autoCreatedServices.Contains(gameService)) return;
             try
             {
-                service?.Dispose();
+                if (service is GameService ownedService) DestroyService(ownedService);
+                else service.Dispose();
             }
             catch (Exception e)
             {
@@ -314,10 +331,20 @@ namespace PEPEngineers.PEPErvice.Runtime
             }
         }
 
-        private static bool TryFindInstance(out ServiceLocator value)
+        private void ClearRegisteredServices()
         {
-            value = FindAnyObjectByType<ServiceLocator>();
-            return value != null;
+            var services = registeredServices.Values
+                .Where(service => service is not GameService && service is not SceneService)
+                .Concat(createdSceneServices).Distinct();
+            foreach (var service in services) DisposeRegisteredService(service);
+            registeredServices.Clear();
+            serviceFactories.Clear();
+            sceneOnlyTypes.Clear();
+            createdSceneServices.Clear();
+            if (localSceneParent != null) DestroyService(localSceneParent.gameObject);
+            if (gameParent != null) DestroyService(gameParent.gameObject);
+            localSceneParent = null;
+            gameParent = null;
         }
 
 #if ODIN_INSPECTOR
@@ -325,7 +352,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 #endif
         protected void Construct()
         {
-            registeredServices.Clear();
+            ClearRegisteredServices();
             RegisterStaticServices();
             RegisterSceneServices();
         }
@@ -333,33 +360,32 @@ namespace PEPEngineers.PEPErvice.Runtime
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void AfterSceneLoaded()
         {
-            if (instance == null && TryFindInstance(out instance) == false)
-                return;
+            if (instance == null) return;
 
-            var services = FindObjectsByType<SceneService>(FindObjectsSortMode.None);
             foreach (var sceneService in instance.sceneServices)
                 if (sceneService && sceneService.SpawnOnLoad)
                 {
+                    var services = FindObjectsByType<SceneService>(FindObjectsInactive.Include, FindObjectsSortMode.None);
                     var existOnScene = false;
                     foreach (var existService in services)
                     {
-                        if (existService.GetType() != sceneService.GetType()) continue;
+                        if (existService.IsDisposed || existService.GetType() != sceneService.GetType()) continue;
                         existOnScene = true;
                         break;
                     }
 
                     if (existOnScene == false)
-                        instance.CreateService(sceneService.gameObject);
+                        instance.CreateService(sceneService);
                 }
         }
 
-        private IService CreateService(GameObject prefab)
+        private IService CreateService(SceneService prefab)
         {
             Assert.IsNotNull(prefab);
-            var service = Instantiate(prefab);
-            service.name = $"<{prefab.name}>";
-            var serviceInstance = service.GetComponent<SceneService>();
-			Assert.IsNotNull(serviceInstance);
+            var serviceInstance = Instantiate(prefab);
+            Assert.IsNotNull(serviceInstance, $"Failed to instantiate service prefab {prefab.name}.");
+            serviceInstance.gameObject.name = $"<{prefab.name}>";
+            createdSceneServices.Add(serviceInstance);
 
             if (createParentForSceneServices == false) return serviceInstance;
 
@@ -374,7 +400,7 @@ namespace PEPEngineers.PEPErvice.Runtime
                 if (gameParent == null)
                 {
                     gameParent = new GameObject("====<GameServices>====").transform;
-                    DontDestroyOnLoad(gameParent);
+                    if (Application.isPlaying) DontDestroyOnLoad(gameParent);
                 }
 
                 serviceInstance.transform.SetParent(gameParent);
@@ -393,7 +419,7 @@ namespace PEPEngineers.PEPErvice.Runtime
                 var services = sceneServicePrefab.GetComponents<SceneService>();
 				Assert.IsNotNull(services);
                 foreach (var service in services)
-                    service.Register(this, () => CreateService(sceneServicePrefab.gameObject));
+                    service.Register(this, () => CreateService(service));
             }
         }
 

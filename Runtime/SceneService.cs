@@ -14,6 +14,7 @@ namespace PEPEngineers.PEPErvice.Runtime
 		public Lifetime Lifetime => lifetime;
 		public bool SpawnOnLoad => spawnOnLoad;
 		protected bool IsApplicationQuitting { get; private set; }
+		internal bool IsDisposed { get; private set; }
 
 		private void OnApplicationQuit()
 		{
@@ -22,7 +23,11 @@ namespace PEPEngineers.PEPErvice.Runtime
 
 		void IDisposable.Dispose()
 		{
-			Destroy(this);
+			if (this == null || IsDisposed) return;
+			// Destroy is deferred; exclude the entire hierarchy from lookups immediately.
+			foreach (var service in GetComponentsInChildren<SceneService>(true)) service.IsDisposed = true;
+			if (Application.isPlaying) Destroy(gameObject);
+			else DestroyImmediate(gameObject);
 		}
 
 		public abstract IRegister Register(in IRegister register, Func<IService> factory);
@@ -32,9 +37,10 @@ namespace PEPEngineers.PEPErvice.Runtime
 		where TService : IService
 	{
 		private static TService instance;
+		private bool initialized;
 
 		private bool CanInitialize =>
-			ReferenceEquals(instance, null) && instance == null && IsApplicationQuitting == false;
+			!instance.IsAlive() && IsApplicationQuitting == false;
 
 		private void Awake()
 		{
@@ -44,36 +50,37 @@ namespace PEPEngineers.PEPErvice.Runtime
 				Debug.Log($"#{TypeCache<TService>.Value.Name}# Created", this);
 #endif
 				instance = GetComponent<TService>();
+				initialized = true;
 
-				if (Lifetime == Lifetime.Singleton)
+				if (Lifetime == Lifetime.Singleton && Application.isPlaying)
 					DontDestroyOnLoad(this);
 
 				OnInitialized();
 			}
 			else
 			{
-				DestroyImmediate(gameObject);
+				((IDisposable)this).Dispose();
 			}
 		}
 
 		private void OnDestroy()
 		{
-			if (ReferenceEquals(instance, this) == false)
-				return;
+			if (!initialized) return;
+			initialized = false;
+			if (ReferenceEquals(instance, this)) instance = default;
 #if DEBUG
 			Debug.Log($"#{TypeCache<TService>.Value.Name}# Destroyed", this);
 #endif
 			OnDestroyed();
-			instance = default;
 		}
 
 		public sealed override IRegister Register(in IRegister register, Func<IService> factory)
 		{
 			return register.Bind<TService>(() =>
 			{
-				var existServices = FindObjectsByType<SceneService>(FindObjectsSortMode.None);
+				var existServices = FindObjectsByType<SceneService>(FindObjectsInactive.Include, FindObjectsSortMode.None);
 				foreach (var existService in existServices)
-					if (existService.TryGetComponent<TService>(out var service))
+					if (!existService.IsDisposed && existService.TryGetComponent<TService>(out var service) && service.IsAlive())
 						return service;
 				return factory();
 			}, Lifetime);

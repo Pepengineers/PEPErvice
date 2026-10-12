@@ -1,4 +1,6 @@
 ﻿using System;
+using PEPEngineers.PEPErvice.Interfaces;
+using PEPEngineers.PEPErvice.Runtime;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -11,6 +13,12 @@ namespace PEPEngineers.PEPErvice.Extensions
 
 	internal static class ComponentExtensions
 	{
+		internal static bool IsAlive(this IService service)
+		{
+			return service != null && (service is not Object obj || obj != null)
+				&& (service is not SceneService sceneService || !sceneService.IsDisposed);
+		}
+
 		public static bool Is<T>(this Object item)
 		{
 			if (ReferenceEquals(item, null))
