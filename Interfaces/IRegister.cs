@@ -1,21 +1,18 @@
 ﻿using System;
-using PEPEngineers.PEPErvice.Runtime;
 using PEPEngineers.PEPErvice.Data;
 
 namespace PEPEngineers.PEPErvice.Interfaces
 {
 	public interface IRegister
 	{
-		static IRegister Instance => ServiceLocator.Instance;
-		
-		IRegister Bind<TService>(Func<IService> resolver, Lifetime lifetime = Lifetime.Singleton)
-			where TService : IService;
-		
-		void Unbind<TService>() where TService : IService;
-		
-		IRegister Register<TService>(TService service, Lifetime lifetime = Lifetime.Singleton)
-			where TService : IService;
+		IRegister BindSubsystem(Type type, Func<ISubsystem> resolver, Lifetime lifetime = Lifetime.Singleton);
+		IRegister BindSubsystem<T>(Func<ISubsystem> resolver, Lifetime lifetime = Lifetime.Singleton) where T : ISubsystem;
 
-		void Unregister<TService>() where TService : IService;
+		void UnbindSubsystem(Type type);
+		void UnbindSubsystem<T>() where T : ISubsystem;
+
+		IRegister RegisterSubsystem(Type type, ISubsystem subsystem, Lifetime lifetime = Lifetime.Singleton);
+		IRegister RegisterSubsystem<T>(T service, Lifetime lifetime = Lifetime.Singleton) where T : ISubsystem;
+		void UnregisterSystem<T>() where T : ISubsystem;
 	}
 }

@@ -1,12 +1,11 @@
-﻿using System.Collections.Generic;
-using PEPEngineers.PEPErvice.Runtime;
+﻿using System;
 
 namespace PEPEngineers.PEPErvice.Interfaces
 {
 	public interface ILocator
 	{
-		static ILocator Instance => ServiceLocator.Instance;
-		TService Resolve<TService>() where TService : IService;
-		ILocator Resolve<TService>(out TService value) where TService : IService;
+		ISubsystem GetSubsystem(Type type);
+		T GetSubsystem<T>() where T : ISubsystem;
+		ILocator GetSubsystem<T>(out T value) where T : ISubsystem;
 	}
 }

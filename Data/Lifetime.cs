@@ -1,6 +1,6 @@
 ﻿namespace PEPEngineers.PEPErvice.Data
 {
-	public enum Lifetime : sbyte
+	public enum Lifetime : byte
 	{
 		Singleton,
 		Scene
